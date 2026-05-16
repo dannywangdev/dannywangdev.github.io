@@ -1,0 +1,1469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Danny Wang | Student & Developer</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M8 10 L4 16 L8 22' stroke='%232563eb' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cline x1='18' y1='9' x2='14' y2='23' stroke='%232563eb' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M24 10 L28 16 L24 22' stroke='%232563eb' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<meta property="og:title" content="Danny Wang | Student & Developer">
+<meta property="og:description" content="Grade 10 IB student, competitive programmer, ML enthusiast in Calgary, Canada. Building things at the intersection of software engineering and machine learning with a passion for everything programming and STEM.">
+<meta property="og:image" content="https://dannywang.dev/portfolio-preview.png">
+<meta property="og:url" content="https://dannywang.dev">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #ffffff;
+  --bg-subtle: #f8f9fa;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-tertiary: #6b7280;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-light: #eef2ff;
+  --border: #e5e7eb;
+  --shadow: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
+  --radius: 0.5rem;
+  --radius-sm: 0.375rem;
+  --radius-full: 9999px;
+  --sidebar-width: 350px;
+  --font-body: Georgia, 'Times New Roman', serif;
+  --font-heading: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'SF Mono', Menlo, Monaco, 'Cascadia Code', 'Courier New', monospace;
+  --transition: 0.2s ease;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.7;
+  font-size: 15px;
+  display: flex;
+  min-height: 100vh;
+}
+
+h1, h2, h3, .section-title, .sidebar h1, .hero h2, .project-card h3, .contact-email {
+  font-family: var(--font-heading);
+}
+
+a { color: var(--accent); text-decoration: none; transition: color var(--transition); }
+a:hover { color: var(--accent-hover); }
+img { max-width: 100%; display: block; }
+ul { list-style: none; }
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: var(--sidebar-width);
+  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1.5rem;
+  z-index: 100;
+  overflow-y: auto;
+}
+
+.sidebar-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.avatar {
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  background: var(--accent-light);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+  margin-bottom: 0.5rem;
+}
+
+.sidebar h1 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.tagline {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  font-family: var(--font-body);
+  margin-bottom: 0.125rem;
+}
+
+.info-line {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.88rem;
+  color: var(--text-tertiary);
+  font-family: var(--font-body);
+}
+
+.info-line svg { flex-shrink: 0; }
+
+.email-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+  width: 100%;
+}
+
+.email-row a {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  word-break: break-all;
+  font-family: var(--font-body);
+}
+.email-row a:hover { color: var(--accent); }
+
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  padding: 0.2rem;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
+  position: relative;
+  flex-shrink: 0;
+}
+.copy-btn:hover { color: var(--accent); background: var(--accent-light); }
+
+.copy-tooltip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--text-primary);
+  color: #fff;
+  font-size: 0.68rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition);
+  font-family: var(--font-heading);
+}
+.copy-tooltip.show { opacity: 1; }
+
+.social-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 0.15rem;
+  margin-top: 0.5rem;
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  font-family: var(--font-heading);
+  color: var(--text-tertiary);
+  padding: 0.2rem 0.35rem;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
+}
+.social-link:hover { color: var(--accent); background: var(--accent-light); }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 0.78rem;
+  font-weight: 500;
+  font-family: var(--font-heading);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
+  margin-top: 0.25rem;
+  border: 1px solid #bbf7d0;
+}
+
+.resume-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 500;
+  font-family: var(--font-heading);
+  padding: 0.5rem 1.1rem;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition);
+  margin-top: 0.5rem;
+}
+.resume-btn:hover { background: var(--accent-hover); color: #fff; }
+
+.sidebar-section-title {
+  font-size: 0.65rem;
+  font-weight: 600;
+  font-family: var(--font-heading);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 0.5rem;
+  margin-bottom: 0.2rem;
+}
+
+.sidebar-experience {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.sidebar-experience-item {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  line-height: 1.4;
+}
+
+.sidebar-experience-item .role {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.sidebar-experience-item .org {
+  color: var(--text-secondary);
+}
+
+.sidebar-experience-item .date {
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+}
+
+.hamburger { display: none; }
+
+/* ===== MAIN CONTENT ===== */
+.main {
+  margin-left: var(--sidebar-width);
+  flex: 1;
+  padding: 3rem 3rem 0;
+  max-width: 820px;
+}
+
+.section {
+  margin-bottom: 3rem;
+}
+
+.section-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1.25rem;
+  letter-spacing: -0.01em;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+}
+
+/* Hero */
+.hero {
+  padding-top: 0.25rem;
+}
+
+.hero h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.6rem;
+}
+
+.hero p {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  max-width: 580px;
+  line-height: 1.7;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--accent-light);
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-family: var(--font-heading);
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-full);
+  margin-top: 0.85rem;
+  border: 1px solid #bfdbfe;
+}
+
+/* About */
+.about-text p {
+  color: var(--text-secondary);
+  line-height: 1.8;
+  font-size: 0.9rem;
+}
+
+/* Achievements - 3 column */
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.achievement-col {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+}
+
+.achievement-col-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-family: var(--font-heading);
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.achievement-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.achievement-list li {
+  position: relative;
+  padding-left: 0.8rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.achievement-list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55rem;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.6;
+}
+
+.achievement-list li:last-child {
+  margin-bottom: 0;
+}
+
+.achievement-list strong {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+/* Timeline */
+.timeline {
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.35rem;
+  bottom: 0;
+  width: 1px;
+  background: var(--border);
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 1.25rem;
+}
+
+.timeline-item:last-child { padding-bottom: 0; }
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -1.5rem;
+  top: 0.45rem;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg);
+  transform: translateX(-3px);
+  z-index: 1;
+}
+
+.timeline-year {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  margin-bottom: 0.1rem;
+}
+
+.timeline-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Skills - Tag clouds */
+.skills-group {
+  margin-bottom: 1.25rem;
+}
+
+.skills-group:last-child { margin-bottom: 0; }
+
+.skills-group-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: var(--font-heading);
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+}
+
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.skill-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius-full);
+  background: var(--accent-light);
+  color: var(--accent);
+  transition: background var(--transition);
+}
+.skill-tag:hover { background: #dbeafe; }
+
+/* Projects Carousel */
+.carousel-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.35s ease;
+}
+
+.project-card {
+  min-width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  transition: box-shadow var(--transition), border-color var(--transition);
+}
+
+.project-card:hover { border-color: #d1d5db; box-shadow: var(--shadow-card); }
+
+.project-card h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.project-card .project-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 0.65rem;
+  font-family: var(--font-body);
+}
+
+.project-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.65rem;
+}
+
+.project-tag {
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  background: var(--accent-light);
+  color: var(--accent);
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+}
+
+.project-tag-archived {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.project-tag-research {
+  background: #f0f4ff;
+  color: #4f46e5;
+  border: 1px solid #c7d2fe;
+}
+
+.project-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  font-family: var(--font-heading);
+}
+
+.carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 0.85rem;
+}
+
+.carousel-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all var(--transition);
+}
+.carousel-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.carousel-dots {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.carousel-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #d1d5db;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition);
+  padding: 0;
+}
+.carousel-dot.active { background: var(--accent); }
+.contact-block p {
+  color: var(--text-secondary);
+  margin-bottom: 0.85rem;
+  font-size: 0.9rem;
+}
+
+.contact-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.contact-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* Footer */
+.footer {
+  padding: 1.25rem 0 2.5rem;
+  border-top: 1px solid var(--border);
+  margin-top: 1.5rem;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  font-family: var(--font-body);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1023px) {
+  body { flex-direction: column; }
+  .sidebar {
+    position: relative;
+    width: 100%;
+    min-height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 1.25rem;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .sidebar-inner {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .avatar { width: 44px; height: 44px; font-size: 0.9rem; margin-bottom: 0; flex-shrink: 0; }
+  .sidebar h1 { font-size: 1rem; }
+  .sidebar .tagline,
+  .sidebar .info-line,
+  .sidebar .sidebar-section-title,
+  .sidebar .sidebar-experience,
+  .sidebar .email-row,
+  .sidebar .social-links,
+  .sidebar .badge,
+  .sidebar .resume-btn { display: none; }
+
+  .sidebar-mobile-content {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: 100%;
+  }
+
+  .hamburger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 0.3rem;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition);
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+  .hamburger:hover { color: var(--accent); background: var(--accent-light); }
+
+  .sidebar.expanded {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sidebar.expanded .sidebar-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    gap: 0.5rem;
+  }
+  .sidebar.expanded .tagline,
+  .sidebar.expanded .info-line,
+  .sidebar.expanded .sidebar-section-title,
+  .sidebar.expanded .sidebar-experience,
+  .sidebar.expanded .email-row,
+  .sidebar.expanded .social-links,
+  .sidebar.expanded .badge,
+  .sidebar.expanded .resume-btn {
+    display: flex;
+  }
+  .sidebar.expanded .sidebar-mobile-content { width: 100%; }
+
+  .main {
+    margin-left: 0;
+    padding: 1.5rem 1.5rem 0;
+  }
+  .hero h2 { font-size: 1.5rem; }
+  .achievements-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 767px) {
+  .sidebar { padding: 0.75rem 1rem; }
+  .main { padding: 1.25rem 1rem 0; }
+  .section { margin-bottom: 2rem; }
+  .hero h2 { font-size: 1.3rem; }
+  .hero p { font-size: 0.88rem; }
+  .section-title { font-size: 1.05rem; }
+  .project-card { padding: 1rem; }
+
+  .achievements-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .skill-name { min-width: 70px; font-size: 0.75rem; }
+}
+
+@media (max-width: 500px) {
+  .achievements-grid { grid-template-columns: 1fr; }
+}
+
+@media (min-width: 1024px) {
+  .sidebar-mobile-content { display: flex; flex-direction: column; width: 100%; }
+  .hamburger { display: none; }
+}
+
+/* ===== Print ===== */
+@media print {
+  body { display: block; font-size: 11pt; color: #000; background: #fff; }
+  .sidebar { position: static; width: 100%; min-height: auto; border: none; padding: 1rem 0; }
+  .sidebar-inner { flex-direction: row; flex-wrap: wrap; gap: 0.5rem 1rem; }
+  .avatar { width: 40px; height: 40px; font-size: 0.8rem; }
+  .sidebar h1 { font-size: 1.1rem; }
+  .sidebar .tagline,
+  .sidebar .info-line,
+  .sidebar .sidebar-section-title,
+  .sidebar .sidebar-experience,
+  .sidebar .email-row,
+  .sidebar .social-links,
+  .sidebar .badge,
+  .sidebar .resume-btn,
+  .sidebar-mobile-content,
+  .hamburger { display: flex !important; }
+  .main { margin: 0; padding: 1rem 0; max-width: 100%; }
+  .section { margin-bottom: 1.25rem; page-break-inside: avoid; }
+  .hero-badge { display: none; }
+  .carousel-controls { display: none; }
+  .carousel-container { overflow: visible; }
+  .carousel-track { transform: none !important; flex-wrap: wrap; gap: 0.75rem; }
+  .project-card { min-width: calc(50% - 0.375rem); border-color: #ccc; }
+  .copy-btn { display: none !important; }
+  .footer { margin-top: 1rem; }
+  a { color: #000; }
+  .achievement-list li::before { background: #000; }
+  * { box-shadow: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== SIDEBAR ===== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-mobile-content">
+    <div class="avatar" aria-label="Danny Wang avatar">DW</div>
+    <div style="flex-grow:1;min-width:0;overflow:hidden;">
+      <h1>Danny Wang</h1>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="sidebar-inner" id="sidebarInner">
+    <p class="tagline">Student &amp; Developer | Competitive Programmer | ML Enthusiast</p>
+
+    <span class="info-line">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Calgary, Alberta, Canada
+    </span>
+
+    <span class="info-line">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Sir Winston Churchill HS - Grade 10 IB
+    </span>
+
+    <span class="info-line">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      4.0 GPA | 97% Average
+    </span>
+
+    <div class="sidebar-section-title">Experience</div>
+    <div class="sidebar-experience">
+      <div class="sidebar-experience-item"><span class="role">Executive</span> &middot; Math Attack Society <span class="date">2025-Present</span></div>
+      <div class="sidebar-experience-item"><span class="role">Executive</span> &middot; Alpine Reasoning Challenge <span class="date">2025-Present</span></div>
+      <div class="sidebar-experience-item"><span class="role">Entrepreneur</span> &middot; eBay Business <span class="date">2024-2026</span></div>
+      <div class="sidebar-experience-item"><span class="role">Co-President</span> &middot; Chess Club <span class="date">2023-2025</span></div>
+    </div>
+
+    <div class="email-row">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      <a href="mailto:dannywang930@gmail.com">dannywang930@gmail.com</a>
+      <button class="copy-btn" data-email="dannywang930@gmail.com" aria-label="Copy email">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span class="copy-tooltip">Copied!</span>
+      </button>
+    </div>
+
+    <div class="social-links">
+      <a href="https://github.com/ThePeeps191" target="_blank" rel="noopener" class="social-link">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.744.083-.729.083-.729 1.205.085 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12 24 5.37 18.63 0 12 0z"/></svg>
+        GitHub
+      </a>
+      <a href="https://www.linkedin.com/in/dannywangdev/" target="_blank" rel="noopener" class="social-link">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        LinkedIn
+      </a>
+      <a href="https://codeforces.com/profile/danny.wang" target="_blank" rel="noopener" class="social-link">
+        <svg width="15" height="15" viewBox="0 0 156 117.6" fill="currentColor"><path d="M30.3,32.7H9c-5,0-9,4.1-9,9v64.7c0,5,4.1,9,9,9h21.3c5,0,9-4.1,9-9V41.7C39.4,36.7,35.3,32.7,30.3,32.7z"/><path d="M84.6,0H63.3c-5,0-9,4.1-9,9v97.4c0,5,4.1,9,9,9h21.3c5,0,9-4.1,9-9V9C93.6,4.1,89.6,0,84.6,0z"/><path d="M138.7,45.1h-21.3c-5,0-9,4.1-9,9v52.3c0,5,4.1,9,9,9h21.3c5,0,9-4.1,9-9V54.1C147.7,49.1,143.7,45.1,138.7,45.1z"/></svg>
+        Codeforces
+      </a>
+    </div>
+
+    <a href="dannywang_resume.pdf" class="resume-btn" download>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download Resume
+    </a>
+  </div>
+</aside>
+
+<!-- ===== MAIN ===== -->
+<main class="main">
+
+  <!-- HERO -->
+  <section class="section hero" id="hero">
+    <h2>Hi, I'm Danny Wang</h2>
+    <p>15-year-old student and developer with over eight years of experience building meaningful software across multiple domains of development and engineering.</p>
+    <br>
+    <p>Whether I'm building deep learning models or dissecting complex math problems, I always aim to develop deep intuition and translate my knowledge into practical solutions.</p>
+    <!-- <span class="hero-badge">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Available for part-time work
+    </span> -->
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section" id="about">
+    <h2 class="section-title">About</h2>
+    <div class="about-text">
+      <p>I started programming at the age of seven through making simple text-based games with Python. Over time, I fell into full-stack development, competitive programming, and machine learning. Today, I write C++ for algorithmic contests and high-speed AI libraries, Python for ML experiments and other scripts, and HTML/CSS/JavaScript for web apps, though I have plenty of <a href="#skills">other technologies</a> under my belt too. I learn fastest by building things, whether it be fast-paced hackathons, huge projects, or deep theoretical research papers. Outside of software engineering, I also excel in math contests, frequently volunteer in my community, play piano, and enjoy learning about physics and robotics.</p>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section class="section" id="experience">
+    <h2 class="section-title">Experience</h2>
+    <div class="timeline">
+      <div class="timeline-item"><div class="timeline-year">2025-Present</div><div class="timeline-desc"><strong>Executive</strong> -- Math Attack Society (Non-Profit). Led planning and execution of a team-based math competition and other youth math events with over 60 student participants. Developed math contest materials, coordinated cross-functional teams, and managed outreach communication to ensure a seamless event experience. Also mentored students preparing for contests such as the AMC 10 through personalized coaching sessions.</div></div>
+      <div class="timeline-item"><div class="timeline-year">2025-Present</div><div class="timeline-desc"><strong>Executive</strong> -- Alpine Reasoning Challenge (Non-Profit). Helped lead operations for youth STEM competitions, coordinating volunteers and managing logistics for multiple events. Built structured problem sets, ensured smooth execution under tight deadlines, and assisted with sponsor outreach and financial planning.</div></div>
+      <div class="timeline-item"><div class="timeline-year">2024-2026</div><div class="timeline-desc"><strong>Entrepreneur</strong> -- eBay Business. Managed end-to-end online sales operations including inventory sourcing, pricing strategies, product listings, and shipment logistics. Maintained strong customer satisfaction ratings through prompt communication and quality control. Prepared and filed accurate business income taxes under Canadian self-employment regulations.</div></div>
+      <div class="timeline-item"><div class="timeline-year">2024-2025</div><div class="timeline-desc"><strong>Youth Volunteer</strong> -- Calgary Public Library. Facilitated reading, coding, and other learning programs for children and youth. Collaborated with library staff to maintain an organized, safe environment while adapting to the needs of diverse participants.</div></div>
+      <div class="timeline-item"><div class="timeline-year">2023-2025</div><div class="timeline-desc"><strong>Co-President</strong> -- Westmount Charter School Chess Club. Organized weekly sessions for teaching/playing chess, and hosted successful school-wide chess tournaments while managing club outreach and funds.</div></div>
+    </div>
+  </section>
+
+  <!-- ACHIEVEMENTS -->
+  <section class="section" id="achievements">
+    <h2 class="section-title">Key Achievements</h2>
+    <div class="achievements-grid">
+      <div class="achievement-col">
+        <h3 class="achievement-col-title">Mathematics</h3>
+        <ul class="achievement-list">
+          <li><strong>AIME</strong> Qualifier twice (top ~5%)</li>
+          <li><strong>1st Place</strong> in Grade 10 for multiple Canadian &amp; Alberta contests</li>
+          <li><strong>65+</strong> contest awards and honour roll placements since 2021</li>
+          <li><strong>6x</strong> Waterloo contests school champion</li>
+        </ul>
+      </div>
+      <div class="achievement-col">
+        <h3 class="achievement-col-title">Competitive Programming</h3>
+        <ul class="achievement-list">
+          <li><strong>1842</strong> <a href="https://codeforces.com/profile/danny.wang" target="_blank">Codeforces</a> Rating (top ~4% worldwide)</li>
+          <li><strong>Gold</strong> USACO Division</li>
+          <li><strong>Group 2</strong> CCC Senior and 3 Certificates of Distinction</li>
+          <li><strong>2000+</strong> problems solved across Codeforces, LeetCode, DMOJ, and more</li>
+          <li><strong>8+ yrs</strong> Coding since 2017</li>
+        </ul>
+      </div>
+      <div class="achievement-col">
+        <h3 class="achievement-col-title">Other Honors &amp; Awards</h3>
+        <ul class="achievement-list">
+          <li><strong>Structure &amp; Design Award</strong> from Calgary Youth Science Fair (CYSF) with $250 prize money</li>
+          <li><strong>Honours with Distinction</strong> in all my RCM Piano exams</li>
+          <lI><strong>3 Gold Medals</strong> from school badminton</lI>
+          <li><strong>Honours with Distinction</strong> awarded for maintaining an average above 90% in high school</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section class="section" id="skills">
+    <h2 class="section-title">Technical Skills</h2>
+
+    <div class="skills-group">
+      <div class="skills-group-title">Languages</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Python</span>
+        <span class="skill-tag">C / C++</span>
+        <span class="skill-tag">HTML / CSS / JS</span>
+        <span class="skill-tag">Ruby</span>
+        <span class="skill-tag">Go</span>
+        <span class="skill-tag">C#</span>
+        <span class="skill-tag">Unity</span>
+        <span class="skill-tag">Arduino</span>
+      </div>
+    </div>
+
+    <div class="skills-group">
+      <div class="skills-group-title">Machine Learning &amp; AI</div>
+      <div class="skill-tags">
+        <span class="skill-tag">PyTorch</span>
+        <span class="skill-tag">Deep Learning</span>
+        <span class="skill-tag">Transformers</span>
+        <span class="skill-tag">NLP / LLMs</span>
+        <span class="skill-tag">Computer Vision</span>
+        <span class="skill-tag">Agentic AI</span>
+        <span class="skill-tag">scikit-learn</span>
+        <span class="skill-tag">TensorFlow</span>
+      </div>
+    </div>
+
+    <div class="skills-group">
+      <div class="skills-group-title">Software Engineering</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Git / GitHub</span>
+        <span class="skill-tag">VSCode</span>
+        <span class="skill-tag">Sublime Text</span>
+        <span class="skill-tag">Windows</span>
+        <span class="skill-tag">Linux / CLI</span>
+        <span class="skill-tag">CI / CD</span>
+      </div>
+    </div>
+
+    <div class="skills-group">
+      <div class="skills-group-title">Web &amp; Backend</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Flask / FastAPI</span>
+        <span class="skill-tag">React / Next.js</span>
+        <span class="skill-tag">SQL / Databases</span>
+        <span class="skill-tag">REST API Design</span>
+        <span class="skill-tag">Django</span>
+        <span class="skill-tag">Node.js / Express</span>
+      </div>
+    </div>
+
+    <div class="skills-group">
+      <div class="skills-group-title">Foundations</div>
+      <div class="skill-tags">
+        <span class="skill-tag">DSA</span>
+        <span class="skill-tag">Calculus II</span>
+        <span class="skill-tag">Competition Maths</span>
+        <span class="skill-tag">Pandas / NumPy</span>
+        <span class="skill-tag">LaTEX</span>
+      </div>
+    </div>
+
+    <div class="skills-group">
+      <div class="skills-group-title">Cybersecurity &amp; IT</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Networking &amp; Ethernet</span>
+        <span class="skill-tag">PC Building</span>
+        <span class="skill-tag">Firewall Configuration</span>
+        <span class="skill-tag">System Administration</span>
+        <span class="skill-tag">SSH &amp; Secure Protocols</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section class="section" id="projects">
+    <h2 class="section-title">Projects</h2>
+    <div class="carousel-container">
+      <div class="carousel-track" id="carouselTrack">
+        <div class="project-card">
+          <h3>SpinFilter - Bias Detection and Content Analysis Platform</h3>
+          <p><strong>Year Built: </strong>2026</p>
+          <p class="project-desc">A project built in 24 hours for the Calgary Hacks 2026 hackathon by a team of four high school students that won the third place prize of $50 competing in Tier 2. Features advanced Python neural network and LLM integration into a React powered and user-friendly frontend engineered to deliver an accessible app that provides insight into media bias and language.</p><br>
+          <div class="project-tags">
+            <span class="project-tag">Python</span>
+            <span class="project-tag">NLP</span>
+            <span class="project-tag">ML</span>
+            <span class="project-tag">React</span>
+            <span class="project-tag">API Integration</span>
+          </div>
+          <a href="https://github.com/ThePeeps191/calgary-hacks-2026" target="_blank" rel="noopener" class="project-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            View on GitHub
+          </a>
+        </div>
+
+        <div class="project-card">
+          <h3>Cosine Similarity Distillation - Novel Neural Network Teacher-Free Distillation Technique</h3>
+          <p><strong>Year Built: </strong>2025-2026</p>
+          <p class="project-desc">Proposed new approach to knowledge distillation in neural networks using a teacher-free method with Gaussian random projection teacher fingerprints for highly storage efficient and computationally friendly student knowledge transfer. Experimentally compared against current KD and FitNet distillation methods and fully implemented in Python utilizing PyTorch's vision ResNet model. Research paper currently a work in progress.</p>
+          <div class="project-tags">
+            <span class="project-tag">Python</span>
+            <span class="project-tag">PyTorch</span>
+            <span class="project-tag">Knowledge Distillation</span>
+            <span class="project-tag project-tag-research">Research</span>
+          </div>
+          <a href="https://github.com/ThePeeps191/cosine-similarity-distillation" target="_blank" rel="noopener" class="project-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            View on GitHub
+          </a>
+        </div>
+
+        <div class="project-card">
+          <h3>Tensorbit Core - Advanced Transformer Pruning Library With EHAP and CORING</h3>
+          <p><strong>Year Built: </strong>2025-2026</p>
+          <p class="project-desc">Library built completely in C++/CUDA for pruning large language models (LLM) and vision transformers using an Efficient Hessian Aware Pruning (EHAP) and CORING algorithm. Built as part of <a href="https://github.com/Tensorbit-Labs" target="_blank">Tensorbit Lab</a>'s state-of-the-art model compression and optimization pipeline featuring a pruning > distillation > quantization approach to running transformer architecture AI models on edge consumer hardware.</p>
+          <div class="project-tags">
+            <span class="project-tag">C++</span>
+            <span class="project-tag">CUDA</span>
+            <span class="project-tag">Model Optimization</span>
+            <span class="project-tag">LLM Sparsity Pruning</span>
+            <span class="project-tag">Linear Algebra</span>
+            <span class="project-tag">AI</span>
+          </div>
+          <a href="https://github.com/Tensorbit-Labs/tensorbit-core" target="_blank" rel="noopener" class="project-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            View on GitHub
+          </a>
+        </div>
+
+        <div class="project-card">
+          <h3>Calgary Housing Neural Network - MLP Built from Scratch</h3>
+          <p><strong>Year Built: </strong>2025-2026</p>
+          <p class="project-desc">A multi-layer perceptron with three hidden layers completely implemented from scratch in Python with no high-level machine learning libraries. Featuring backpropagation, gradient descent, training loops, Huber loss, and Adam optimizations to power a neural network that accurately regresses house prices in Calgary, Canada based purely off of community, land size, year built, and land use designations.</p>
+          <div class="project-tags">
+            <span class="project-tag">Python</span>
+            <span class="project-tag">Math</span>
+            <span class="project-tag">ML</span>
+            <span class="project-tag">Deep Learning</span>
+            <span class="project-tag">NumPy</span>
+            <span class="project-tag">Pandas</span>
+          </div>
+          <a href="https://github.com/ThePeeps191/calgary-housing-nn" target="_blank" rel="noopener" class="project-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            View on GitHub
+          </a>
+        </div>
+
+        <div class="project-card">
+          <h3>This Portfolio Website</h3>
+          <p><strong>Year Built: </strong>2025-2026</p>
+          <p class="project-desc">Built from scratch with vanilla HTML/CSS/JS, with no frameworks, no build step, and no external dependencies. Features a responsive fixed-sidebar layout, animated carousel, touch-swipe support, interactive skill tags, and a print-optimized stylesheet. Designed with a minimalist light-mode aesthetic and system fonts to ensure fast load times and a professional presentation.</p>
+          <div class="project-tags">
+            <span class="project-tag">HTML</span>
+            <span class="project-tag">CSS</span>
+            <span class="project-tag">JavaScript</span>
+          </div>
+          <a href="https://github.com/dannywangdev/dannywangdev.github.io" target="_blank" rel="noopener" class="project-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            View on GitHub
+          </a>
+        </div>
+
+        <div class="project-card">
+          <h3>CCC Solutions Archive</h3>
+          <p><strong>Year Built: </strong>2025-2026</p>
+          <p class="project-desc">Comprehensive solution editorials to every past Canadian Computing Competition (CCC) problem, fully written by me with code implementations in either Python and C++. Each problem includes a detailed breakdown of the algorithmic approach, time complexity analysis, and alternative solution strategies. Currently a work-in-progress but new editorials are added regularly as I work through writing solutions for the remaining problems across both the Junior and Senior division.</p>
+          <div class="project-tags">
+            <span class="project-tag">Data Structures</span>
+            <span class="project-tag">Algorithms</span>
+            <span class="project-tag">Competitive Programming</span>
+            <span class="project-tag">C++</span>
+            <span class="project-tag">Python</span>
+          </div>
+          <a href="https://thepeeps191.github.io/ccc/" target="_blank" rel="noopener" class="project-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            View Project
+          </a>
+        </div>
+
+        <div class="project-card">
+          <h3>Pokémon Wishstone - WIP Custom Pokémon ROM Hack</h3>
+          <p><strong>Year Built: </strong>2024-2026</p>
+          <p class="project-desc">A custom Pokémon ROM hack for the Game Boy Advance, built using the decompilation framework of Pokémon Emerald (pokeemerald-expansion). Features a new region, custom map layouts, modified Pokémon spawns and trainer battles, original scripts and dialogue, and quality-of-life gameplay improvements. A long-term project exploring game design, systems programming, and large-scale C codebases.</p>
+          <div class="project-tags">
+            <span class="project-tag">C / C++</span>
+            <span class="project-tag">Game Design</span>
+            <span class="project-tag">GBA</span>
+            <span class="project-tag">Scripting</span>
+            <span class="project-tag">ROM Hacking</span>
+          </div>
+          <a href="https://github.com/ThePeeps191/pokeemerald-expansion" target="_blank" rel="noopener" class="project-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            View on GitHub
+          </a>
+        </div>
+
+        <div class="project-card">
+          <h3>Skibidi Toilet: Attack on G-Man</h3>
+          <p><strong>Year Built: </strong>2024-2025</p>
+          <p class="project-desc">A 3D action game built for a school course on Game Development in Unity with custom shaders, enemy AI, player mechanics, and level design. Developed entirely in C# with ShaderLab and HLSL for visual effects. Features multiple gameplay stages, interactive environments, and polished game feel. Originally designed for virtual reality play but has been implemented as a regular game.</p>
+          <div class="project-tags">
+            <span class="project-tag project-tag-archived">Archived</span>
+            <span class="project-tag">C#</span>
+            <span class="project-tag">Unity</span>
+            <span class="project-tag">ShaderLab</span>
+            <span class="project-tag">Game Development</span>
+          </div>
+          <a href="https://github.com/ThePeeps191/skibidigame" target="_blank" rel="noopener" class="project-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            View on GitHub
+          </a>
+        </div>
+
+        <div class="project-card">
+          <h3>YOLO Dog vs Cat Classifier</h3>
+          <p><strong>Year Built: </strong>2024</p>
+          <p class="project-desc">A computer vision model trained to classify and detect dogs and cats using YOLOv8. Built with a custom annotated dataset, the pipeline covers data preprocessing, model training, validation, and inference on new images. A foundational computer vision project exploring object detection workflows end-to-end.</p>
+          <div class="project-tags">
+            <span class="project-tag project-tag-archived">Archived</span>
+            <span class="project-tag">Python</span>
+            <span class="project-tag">YOLOv8</span>
+            <span class="project-tag">Computer Vision</span>
+            <span class="project-tag">Deep Learning</span>
+          </div>
+          <a href="https://github.com/ThePeeps191/yolo_dogcat" target="_blank" rel="noopener" class="project-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            View on GitHub
+          </a>
+        </div>
+
+        <div class="project-card">
+          <h3>Arduino Nano Gesture-Controlled Car</h3>
+          <p><strong>Year Built: </strong>2024</p>
+          <p class="project-desc">A gesture-controlled car built with two Arduino Nanos, using accelerometer and gyroscope sensor input to interpret hand movements and control motor direction and speed wirelessly via IR communication across both Arduinos. Written in C++ for the Arduino framework, combining embedded systems programming with real-time sensor processing, circuit prototyping, and motor control logic.</p>
+          <div class="project-tags">
+            <span class="project-tag project-tag-archived">Archived</span>
+            <span class="project-tag">C++</span>
+            <span class="project-tag">Arduino</span>
+            <span class="project-tag">Embedded Systems</span>
+            <span class="project-tag">Hardware</span>
+          </div>
+          <a href="https://github.com/ThePeeps191/gesture_car_innovations" target="_blank" rel="noopener" class="project-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            View on GitHub
+          </a>
+        </div>
+
+        <div class="project-card">
+          <h3>Cheapest Pokémon Card - eBay Scraper With a Flask Interface</h3>
+          <p><strong>Year Built: </strong>2024</p>
+          <p class="project-desc">A web application that scrapes eBay listings to find the cheapest listing for a specific Pokémon card, presented through a clean Flask interface. Handles real-time search queries, parses and filters listing data, and automatically opens up the listing it finds. Combines web scraping, backend API development, and frontend rendering in a single lightweight tool.</p>
+          <div class="project-tags">
+            <span class="project-tag project-tag-archived">Archived</span>
+            <span class="project-tag">Python</span>
+            <span class="project-tag">Flask</span>
+            <span class="project-tag">Web Scraping</span>
+            <span class="project-tag">BeautifulSoup</span>
+          </div>
+          <a href="https://github.com/ThePeeps191/cheapest-pkmn-card" target="_blank" rel="noopener" class="project-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            View on GitHub
+          </a>
+        </div>
+
+        <div class="project-card">
+          <h3>Learnmonkey - Programming Education Platform</h3>
+          <p><strong>Year Built: </strong>2022-2024</p>
+          <p class="project-desc">An interactive programming education website built as a collaborative open-source project. Features a variety of lessons across everything from Python to Go to C++ to Java. Designed to make foundational programming accessible and to provide detailed tutorials for everything programming. Built from scratch with HTML, CSS, and JavaScript.</p>
+          <div class="project-tags">
+            <span class="project-tag project-tag-archived">Archived</span>
+            <span class="project-tag">HTML</span>
+            <span class="project-tag">CSS</span>
+            <span class="project-tag">JavaScript</span>
+            <span class="project-tag">Education</span>
+          </div>
+          <a href="https://github.com/learnmonkey/learnmonkey.github.io" target="_blank" rel="noopener" class="project-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            View on GitHub
+          </a>
+        </div>
+
+        <div class="project-card">
+          <h3>Monkeytyper - Python Bot to Automate Monkeytype Records</h3>
+          <p><strong>Year Built: </strong>2023</p>
+          <p class="project-desc">A Python bot to automate Monkeytype records, with built-in text detection and autotyping for an average of 400 WPM on the 10-word English benchmark. Uses PyAutoGUI for automation and Tesseract OCR for on-screen text detection and recognition.</p>
+          <div class="project-tags">
+            <span class="project-tag project-tag-archived">Archived</span>
+            <span class="project-tag">Python</span>
+            <span class="project-tag">PyAutoGUI</span>
+            <span class="project-tag">OCR</span>
+            <span class="project-tag">Automation</span>
+          </div>
+          <a href="https://github.com/ThePeeps191/Monkeytyper" target="_blank" rel="noopener" class="project-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            View on GitHub
+          </a>
+        </div>
+
+        <div class="project-card">
+          <h3>Dicemazing - 2022 GMTK Game Jam Submission</h3>
+          <p><strong>Year Built: </strong>2022</p>
+          <p class="project-desc">A Unity game built by Danny Wang &amp; Jonas Huang in 48 hours for the 2022 GMTK Game Jam under the theme "Roll of the Dice." Features dice-based gameplay mechanics with custom shaders and visual effects. Built primarily in ShaderLab and HLSL with C# game logic.</p>
+          <div class="project-tags">
+            <span class="project-tag project-tag-archived">Archived</span>
+            <span class="project-tag">C#</span>
+            <span class="project-tag">Unity</span>
+            <span class="project-tag">ShaderLab</span>
+            <span class="project-tag">Game Jam</span>
+          </div>
+          <a href="https://github.com/wawahwa801/dicemazing" target="_blank" rel="noopener" class="project-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            View on GitHub
+          </a>
+        </div>
+
+        <div class="project-card">
+          <h3>Arduino Science Fair Car - Calgary Youth Science Fair Gold Award</h3>
+          <p><strong>Year Built: </strong>2021-2022</p>
+          <p class="project-desc">An Arduino-based autonomous car project that won the Structure &amp; Design Award and a Gold Medal at the Calgary Youth Science Fair. Features sensor-based navigation, motor control logic, and embedded C++ programming on the Arduino platform. Integrated multiple hardware components including ultrasonic sensors and motor drivers for autonomous obstacle avoidance.</p>
+          <div class="project-tags">
+            <span class="project-tag project-tag-archived">Archived</span>
+            <span class="project-tag">C++</span>
+            <span class="project-tag">Arduino</span>
+            <span class="project-tag">Embedded Systems</span>
+            <span class="project-tag">Hardware</span>
+          </div>
+          <a href="https://github.com/ThePeeps191/Arduino-Car-Code" target="_blank" rel="noopener" class="project-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            View on GitHub
+          </a>
+        </div>
+
+        <div class="project-card">
+          <h3>Bobville Economy Bot - Discord Economy &amp; Game Bot</h3>
+          <p><strong>Year Built: </strong>2020-2021</p>
+          <p class="project-desc">A full-featured Discord economy bot with virtual currency systems, mini-games, item shops, and user progression. Built using discord.py with a modular command structure, persistent database storage, and interactive gameplay commands that served a school community server.</p>
+          <div class="project-tags">
+            <span class="project-tag project-tag-archived">Archived</span>
+            <span class="project-tag">Python</span>
+            <span class="project-tag">discord.py</span>
+            <span class="project-tag">Database</span>
+          </div>
+          <a href="https://github.com/ThePeeps191/Bobville-Economy-Bot" target="_blank" rel="noopener" class="project-link">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            View on GitHub
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="carousel-controls">
+      <button class="carousel-btn" id="prevBtn" aria-label="Previous project">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="carousel-dots" id="carouselDots"></div>
+      <button class="carousel-btn" id="nextBtn" aria-label="Next project">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+
+    <div style="text-align:center;margin-top:1.25rem;">
+      <a href="https://github.com/ThePeeps191?tab=repositories" target="_blank" rel="noopener" class="project-link">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        View more on GitHub
+      </a>
+    </div>
+  </section>
+
+  <!-- RESEARCH -->
+  <section class="section" id="research">
+    <h2 class="section-title">Research</h2>
+    <div class="about-text">
+      <p><strong>Cosine Similarity Distillation (CSD) - Teacher-Free Knowledge Distillation via Random Projection Fingerprints</strong> (2025-present)</p>
+      <div class="project-tags"><span class="project-tag project-tag-research">Independent Research</span></div>
+      <p>A novel distillation method that eliminates the need for live teacher model forwarding during student training. Instead of loading the teacher at every batch, CSD precomputes compact "fingerprints", which are the cosine similarities between the teacher's normalized intermediate features and the columns of a frozen random reference matrix. During student training, the student then regresses these fingerprints alongside the classification loss, achieving competitive accuracy with 67x smaller storage and a single teacher forward pass compared to traditional KD or FitNet distillation methods. Built in PyTorch on CIFAR-100 with ResNet architectures, featuring augmentation-aware fingerprint generation, cosine similarity loss, and lambda warmup. Demonstrated per-class fingerprints as small as 50 KB. Paper is currently a work in progress.</p>
+
+    </div>
+  </section>
+
+  <!-- TIMELINE -->
+  <!-- <section class="section" id="journey">
+    <h2 class="section-title">Programming Journey</h2>
+    <div class="timeline">
+      <div class="timeline-item"><div class="timeline-year">2017</div><div class="timeline-desc">First Python script. Instant obsession.</div></div>
+      <div class="timeline-item"><div class="timeline-year">2018</div><div class="timeline-desc">Tkinter GUIs, Object-Oriented-Programming.</div></div>
+      <div class="timeline-item"><div class="timeline-year">2019</div><div class="timeline-desc">Discovered competitive programming. Started DSA.</div></div>
+      <div class="timeline-item"><div class="timeline-year">2020</div><div class="timeline-desc">Algorithms, graph theory, DP. Started math olympiad training.</div></div>
+      <div class="timeline-item"><div class="timeline-year">2021</div><div class="timeline-desc">AIME qualifier. Switched to C++ for CP. Codeforces specialist.</div></div>
+      <div class="timeline-item"><div class="timeline-year">2022</div><div class="timeline-desc">USACO Gold. Codeforces expert. CCC Senior top results.</div></div>
+      <div class="timeline-item"><div class="timeline-year">2023</div><div class="timeline-desc">Machine learning — PyTorch, backprop from scratch, NLP, research papers.</div></div>
+      <div class="timeline-item"><div class="timeline-year">2024</div><div class="timeline-desc">Hackathons, full-stack apps, open source.</div></div>
+      <div class="timeline-item"><div class="timeline-year">2025-2026</div><div class="timeline-desc">Portfolio polish, seeking SWE/ML part-time roles.</div></div>
+    </div>
+  </section> -->
+
+  <!-- CONTACT -->
+  <section class="section" id="contact">
+    <h2 class="section-title">Get in Touch</h2>
+    <div class="contact-block">
+      <p>If you're building something interesting, let's connect.</p>
+      <div class="contact-row">
+        <span class="contact-email">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <a href="mailto:dannywang930@gmail.com">dannywang930@gmail.com</a>
+        </span>
+        <button class="copy-btn" data-email="dannywang930@gmail.com" aria-label="Copy email">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span class="copy-tooltip">Copied!</span>
+        </button>
+        <a href="https://github.com/ThePeeps191" target="_blank" rel="noopener" aria-label="GitHub" style="display:inline-flex;align-items:center;gap:0.3rem;font-size:0.82rem;font-weight:500;font-family:var(--font-heading);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.744.083-.729.083-.729 1.205.085 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12 24 5.37 18.63 0 12 0z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    &copy; 2026 Danny Wang &middot; Built from scratch
+    <span style="float:right;"><a href="#" style="font-family:var(--font-heading);font-size:0.78rem;">Back to top &uarr;</a></span>
+  </footer>
+
+</main>
+
+<script>
+(function() {
+  'use strict';
+
+  // ===== HAMBURGER MENU =====
+  const sidebar = document.getElementById('sidebar');
+  const hamburger = document.getElementById('hamburger');
+  if (hamburger && sidebar) {
+    hamburger.addEventListener('click', function(e) {
+      e.stopPropagation();
+      sidebar.classList.toggle('expanded');
+    });
+    document.addEventListener('click', function(e) {
+      if (!sidebar.contains(e.target) && sidebar.classList.contains('expanded')) {
+        sidebar.classList.remove('expanded');
+      }
+    });
+  }
+
+  // ===== COPY EMAIL =====
+  document.querySelectorAll('.copy-btn').forEach(function(btn) {
+    btn.addEventListener('click', async function() {
+      const email = btn.getAttribute('data-email');
+      if (!email) return;
+      try {
+        await navigator.clipboard.writeText(email);
+        const tooltip = btn.querySelector('.copy-tooltip');
+        if (tooltip) {
+          tooltip.classList.add('show');
+          setTimeout(function() { tooltip.classList.remove('show'); }, 1800);
+        }
+      } catch (err) {
+        const textarea = document.createElement('textarea');
+        textarea.value = email;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        const tooltip = btn.querySelector('.copy-tooltip');
+        if (tooltip) {
+          tooltip.classList.add('show');
+          setTimeout(function() { tooltip.classList.remove('show'); }, 1800);
+        }
+      }
+    });
+  });
+
+  // ===== CAROUSEL =====
+  const track = document.getElementById('carouselTrack');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const dotsContainer = document.getElementById('carouselDots');
+  let currentIndex = 0;
+  let totalSlides = 0;
+
+  function initCarousel() {
+    if (!track) return;
+    const slides = track.querySelectorAll('.project-card');
+    totalSlides = slides.length;
+    if (totalSlides === 0) return;
+
+    dotsContainer.innerHTML = '';
+    for (let i = 0; i < totalSlides; i++) {
+      const dot = document.createElement('button');
+      dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('data-index', i);
+      dot.addEventListener('click', function() { goToSlide(i); });
+      dotsContainer.appendChild(dot);
+    }
+
+    goToSlide(0);
+  }
+
+  function goToSlide(index) {
+    if (!track) return;
+    const slides = track.querySelectorAll('.project-card');
+    if (index < 0) index = totalSlides - 1;
+    if (index >= totalSlides) index = 0;
+    currentIndex = index;
+    track.style.transform = 'translateX(-' + (currentIndex * 100) + '%)';
+
+    const dots = dotsContainer.querySelectorAll('.carousel-dot');
+    dots.forEach(function(d, i) {
+      d.classList.toggle('active', i === currentIndex);
+    });
+  }
+
+  if (prevBtn) prevBtn.addEventListener('click', function() { goToSlide(currentIndex - 1); });
+  if (nextBtn) nextBtn.addEventListener('click', function() { goToSlide(currentIndex + 1); });
+
+  // touch swipe
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  if (track) {
+    track.addEventListener('touchstart', function(e) {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    track.addEventListener('touchend', function(e) {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, { passive: true });
+  }
+
+  function handleSwipe() {
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) goToSlide(currentIndex + 1);
+      else goToSlide(currentIndex - 1);
+    }
+  }
+
+  // ===== INIT =====
+  initCarousel();
+
+  window.addEventListener('resize', function() {
+    if (track) track.style.transform = 'translateX(-' + (currentIndex * 100) + '%)';
+  });
+
+})();
+</script>
+
+</body>
+</html>
