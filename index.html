@@ -1013,85 +1013,6 @@ ul { list-style: none; }
     </div>
   </section>
 
-  <!-- SKILLS -->
-  <section class="section" id="skills">
-    <h2 class="section-title">Technical Skills</h2>
-
-    <div class="skills-group">
-      <div class="skills-group-title">Languages</div>
-      <div class="skill-tags">
-        <span class="skill-tag">Python</span>
-        <span class="skill-tag">C / C++</span>
-        <span class="skill-tag">HTML / CSS / JS</span>
-        <span class="skill-tag">Ruby</span>
-        <span class="skill-tag">Go</span>
-        <span class="skill-tag">C#</span>
-        <span class="skill-tag">Unity</span>
-        <span class="skill-tag">Arduino</span>
-      </div>
-    </div>
-
-    <div class="skills-group">
-      <div class="skills-group-title">Machine Learning &amp; AI</div>
-      <div class="skill-tags">
-        <span class="skill-tag">PyTorch</span>
-        <span class="skill-tag">Deep Learning</span>
-        <span class="skill-tag">Transformers</span>
-        <span class="skill-tag">NLP / LLMs</span>
-        <span class="skill-tag">Computer Vision</span>
-        <span class="skill-tag">Agentic AI</span>
-        <span class="skill-tag">scikit-learn</span>
-        <span class="skill-tag">TensorFlow</span>
-      </div>
-    </div>
-
-    <div class="skills-group">
-      <div class="skills-group-title">Software Engineering</div>
-      <div class="skill-tags">
-        <span class="skill-tag">Git / GitHub</span>
-        <span class="skill-tag">VSCode</span>
-        <span class="skill-tag">Sublime Text</span>
-        <span class="skill-tag">Windows</span>
-        <span class="skill-tag">Linux / CLI</span>
-        <span class="skill-tag">CI / CD</span>
-      </div>
-    </div>
-
-    <div class="skills-group">
-      <div class="skills-group-title">Web &amp; Backend</div>
-      <div class="skill-tags">
-        <span class="skill-tag">Flask / FastAPI</span>
-        <span class="skill-tag">React / Next.js</span>
-        <span class="skill-tag">SQL / Databases</span>
-        <span class="skill-tag">REST API Design</span>
-        <span class="skill-tag">Django</span>
-        <span class="skill-tag">Node.js / Express</span>
-      </div>
-    </div>
-
-    <div class="skills-group">
-      <div class="skills-group-title">Foundations</div>
-      <div class="skill-tags">
-        <span class="skill-tag">DSA</span>
-        <span class="skill-tag">Calculus II</span>
-        <span class="skill-tag">Competition Maths</span>
-        <span class="skill-tag">Pandas / NumPy</span>
-        <span class="skill-tag">LaTeX</span>
-      </div>
-    </div>
-
-    <div class="skills-group">
-      <div class="skills-group-title">Cybersecurity &amp; IT</div>
-      <div class="skill-tags">
-        <span class="skill-tag">Networking &amp; Ethernet</span>
-        <span class="skill-tag">PC Building</span>
-        <span class="skill-tag">Firewall Configuration</span>
-        <span class="skill-tag">System Administration</span>
-        <span class="skill-tag">SSH &amp; Secure Protocols</span>
-      </div>
-    </div>
-  </section>
-
   <!-- PROJECTS -->
   <section class="section" id="projects">
     <h2 class="section-title">Projects</h2>
@@ -1415,6 +1336,85 @@ ul { list-style: none; }
       <p><strong>Cosine Similarity Distillation (CSD) - Teacher-Free Knowledge Transfer via Random Projection Fingerprints</strong> (2025-present) <span class="project-tag project-tag-research" style="display:inline;margin-left:0.3rem;">Independent Research</span></p>
       <p>A novel distillation method that eliminates the need for live teacher model forwarding during student training. Instead of loading the teacher at every batch, CSD precomputes compact "fingerprints", which are the cosine similarities between the teacher's normalized intermediate features and the columns of a frozen random reference matrix. During student training, the student then regresses these fingerprints alongside the classification loss, achieving competitive accuracy with 67x smaller storage and a single teacher forward pass compared to traditional KD or FitNet distillation methods. Built in PyTorch on CIFAR-100 with ResNet architectures, featuring augmentation-aware fingerprint generation, cosine similarity loss, and lambda warmup. Demonstrated per-class fingerprints as small as 50 KB. Paper is currently a work in progress.</p>
 
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section class="section" id="skills">
+    <h2 class="section-title">Technical Skills</h2>
+
+    <div class="skills-group">
+      <div class="skills-group-title">Languages</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Python</span>
+        <span class="skill-tag">C / C++</span>
+        <span class="skill-tag">HTML / CSS / JS</span>
+        <span class="skill-tag">Ruby</span>
+        <span class="skill-tag">Go</span>
+        <span class="skill-tag">C#</span>
+        <span class="skill-tag">Unity</span>
+        <span class="skill-tag">Arduino</span>
+      </div>
+    </div>
+
+    <div class="skills-group">
+      <div class="skills-group-title">Machine Learning &amp; AI</div>
+      <div class="skill-tags">
+        <span class="skill-tag">PyTorch</span>
+        <span class="skill-tag">Deep Learning</span>
+        <span class="skill-tag">Transformers</span>
+        <span class="skill-tag">NLP / LLMs</span>
+        <span class="skill-tag">Computer Vision</span>
+        <span class="skill-tag">Agentic AI</span>
+        <span class="skill-tag">scikit-learn</span>
+        <span class="skill-tag">TensorFlow</span>
+      </div>
+    </div>
+
+    <div class="skills-group">
+      <div class="skills-group-title">Software Engineering</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Git / GitHub</span>
+        <span class="skill-tag">VSCode</span>
+        <span class="skill-tag">Sublime Text</span>
+        <span class="skill-tag">Windows</span>
+        <span class="skill-tag">Linux / CLI</span>
+        <span class="skill-tag">CI / CD</span>
+      </div>
+    </div>
+
+    <div class="skills-group">
+      <div class="skills-group-title">Web &amp; Backend</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Flask / FastAPI</span>
+        <span class="skill-tag">React / Next.js</span>
+        <span class="skill-tag">SQL / Databases</span>
+        <span class="skill-tag">REST API Design</span>
+        <span class="skill-tag">Django</span>
+        <span class="skill-tag">Node.js / Express</span>
+      </div>
+    </div>
+
+    <div class="skills-group">
+      <div class="skills-group-title">Foundations</div>
+      <div class="skill-tags">
+        <span class="skill-tag">DSA</span>
+        <span class="skill-tag">Calculus II</span>
+        <span class="skill-tag">Competition Maths</span>
+        <span class="skill-tag">Pandas / NumPy</span>
+        <span class="skill-tag">LaTeX</span>
+      </div>
+    </div>
+
+    <div class="skills-group">
+      <div class="skills-group-title">Cybersecurity &amp; IT</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Networking &amp; Ethernet</span>
+        <span class="skill-tag">PC Building</span>
+        <span class="skill-tag">Firewall Configuration</span>
+        <span class="skill-tag">System Administration</span>
+        <span class="skill-tag">SSH &amp; Secure Protocols</span>
+      </div>
     </div>
   </section>
 
