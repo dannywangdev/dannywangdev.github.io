@@ -81,8 +81,10 @@ ul {{ list-style: none; }}
 .sidebar h1 {{ font-size: 1.2rem; font-weight: 600; color: var(--text-primary); line-height: 1.3; letter-spacing: -0.01em; }}
 .tagline {{ font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; font-family: var(--font-body); margin-bottom: 0.125rem; }}
 .info-line {{ display: flex; align-items: center; gap: 0.45rem; font-size: 0.88rem; color: var(--text-tertiary); font-family: var(--font-body); }}
+.info-line svg {{ flex-shrink: 0; }}
 .email-row {{ display: flex; align-items: center; gap: 0.4rem; margin-top: 0.25rem; width: 100%; }}
 .email-row a {{ font-size: 0.88rem; color: var(--text-secondary); word-break: break-all; font-family: var(--font-body); }}
+.email-row a:hover {{ color: var(--accent); }}
 .social-links {{ display: flex; align-items: center; flex-wrap: nowrap; gap: 0.15rem; margin-top: 0.5rem; }}
 .social-link {{
   display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.72rem;
@@ -90,6 +92,27 @@ ul {{ list-style: none; }}
   padding: 0.2rem 0.35rem; border-radius: var(--radius-sm); transition: all var(--transition);
 }}
 .social-link:hover {{ color: var(--accent); background: var(--accent-light); }}
+.copy-btn {{
+  display: inline-flex; align-items: center; justify-content: center;
+  background: none; border: none; cursor: pointer;
+  color: var(--text-tertiary); padding: 0.2rem; border-radius: var(--radius-sm);
+  transition: all var(--transition); position: relative; flex-shrink: 0;
+}}
+.copy-btn:hover {{ color: var(--accent); background: var(--accent-light); }}
+.copy-tooltip {{
+  position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+  background: var(--text-primary); color: #fff; font-size: 0.68rem; padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm); white-space: nowrap;
+  opacity: 0; pointer-events: none; transition: opacity var(--transition); font-family: var(--font-heading);
+}}
+.copy-tooltip.show {{ opacity: 1; }}
+.resume-btn {{
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: var(--accent); color: #fff; font-size: 0.88rem; font-weight: 500;
+  font-family: var(--font-heading); padding: 0.5rem 1.1rem; border-radius: var(--radius);
+  border: none; cursor: pointer; transition: background var(--transition); margin-top: 0.5rem;
+}}
+.resume-btn:hover {{ background: var(--accent-hover); color: #fff; }}
 .hamburger {{ display: none; }}
 .main {{ margin-left: var(--sidebar-width); flex: 1; padding: 3rem 3rem 0; max-width: 820px; }}
 
@@ -223,14 +246,14 @@ ul {{ list-style: none; }}
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Download Resume
     </a>
-    <a href="../../index.html" class="sidebar-link">&larr; Portfolio</a>
+    <a href="../../" class="sidebar-link">&larr; Portfolio</a>
   </div>
 </aside>
 
 <main class="main">
   <section class="section article">
 
-    <a href="../index.html" class="article-back">&larr; Back to Writeups</a>
+    <a href="../" class="article-back">&larr; Back to Writeups</a>
 
     <h1>{title}</h1>
     <div class="article-tags">
@@ -251,7 +274,7 @@ int main() {{
   </section>
 
   <footer class="footer">
-    &copy; 2026 Danny Wang &middot; <a href="../../index.html">Portfolio</a>
+    &copy; 2026 Danny Wang &middot; <a href="../../">Portfolio</a>
   </footer>
 </main>
 
@@ -270,6 +293,35 @@ int main() {{
       }}
     }});
   }}
+
+  document.querySelectorAll('.copy-btn').forEach(function(btn) {{
+    btn.addEventListener('click', async function() {{
+      const email = btn.getAttribute('data-email');
+      if (!email) return;
+      try {{
+        await navigator.clipboard.writeText(email);
+        const tooltip = btn.querySelector('.copy-tooltip');
+        if (tooltip) {{
+          tooltip.classList.add('show');
+          setTimeout(function() {{ tooltip.classList.remove('show'); }}, 1800);
+        }}
+      }} catch (err) {{
+        const textarea = document.createElement('textarea');
+        textarea.value = email;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        const tooltip = btn.querySelector('.copy-tooltip');
+        if (tooltip) {{
+          tooltip.classList.add('show');
+          setTimeout(function() {{ tooltip.classList.remove('show'); }}, 1800);
+        }}
+      }}
+    }});
+  }});
 }})();
 </script>
 </body>
