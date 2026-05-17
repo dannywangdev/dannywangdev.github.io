@@ -142,6 +142,19 @@ ul { list-style: none; }
 
 .hamburger { display: none; }
 
+.sidebar-section-title {
+  font-size: 0.65rem; font-weight: 600; font-family: var(--font-heading);
+  color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.06em;
+  margin-top: 0.5rem; margin-bottom: 0.2rem;
+}
+
+.sidebar-experience { display: flex; flex-direction: column; gap: 0.25rem; width: 100%; }
+.sidebar-experience-item { font-size: 0.78rem; color: var(--text-secondary); font-family: var(--font-body); line-height: 1.4; }
+.sidebar-experience-item .role { font-weight: 600; color: var(--text-primary); }
+.sidebar-experience-item .date { font-size: 0.68rem; font-family: var(--font-mono); color: var(--text-tertiary); }
+.sidebar-experience-item a, .sidebar-experience-item a:visited { color: inherit; text-decoration: none; cursor: default; }
+.sidebar-experience-item a:hover { text-decoration: underline; cursor: pointer; }
+
 /* ===== MAIN ===== */
 .main {
   margin-left: var(--sidebar-width);
@@ -212,7 +225,7 @@ ul { list-style: none; }
   .sidebar-inner { flex-direction: row; align-items: center; width: 100%; gap: 0.75rem; flex-wrap: wrap; }
   .avatar { width: 44px; height: 44px; font-size: 0.9rem; margin-bottom: 0; flex-shrink: 0; }
   .sidebar h1 { font-size: 1rem; }
-  .sidebar .tagline, .sidebar .info-line, .sidebar .email-row, .sidebar .social-links, .sidebar .resume-btn, .sidebar .sidebar-link { display: none; }
+  .sidebar .tagline, .sidebar .info-line, .sidebar .sidebar-section-title, .sidebar .sidebar-experience, .sidebar .email-row, .sidebar .social-links, .sidebar .resume-btn, .sidebar .sidebar-link { display: none; }
 
   .sidebar-mobile-content { display: flex; align-items: center; gap: 0.6rem; width: 100%; }
 
@@ -226,7 +239,7 @@ ul { list-style: none; }
 
   .sidebar.expanded { flex-direction: column; align-items: stretch; }
   .sidebar.expanded .sidebar-inner { flex-direction: column; align-items: flex-start; width: 100%; gap: 0.5rem; }
-  .sidebar.expanded .tagline, .sidebar.expanded .info-line, .sidebar.expanded .email-row,
+  .sidebar.expanded .tagline, .sidebar.expanded .info-line, .sidebar.expanded .sidebar-section-title, .sidebar.expanded .sidebar-experience, .sidebar.expanded .email-row,
   .sidebar.expanded .social-links, .sidebar.expanded .resume-btn, .sidebar.expanded .sidebar-link { display: flex; }
   .sidebar.expanded .sidebar-mobile-content { width: 100%; }
 
@@ -269,9 +282,23 @@ ul { list-style: none; }
       Sir Winston Churchill HS - Grade 10 IB
     </span>
     <span class="info-line">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Sir Winston Churchill HS - Grade 10 IB
+    </span>
+
+    <span class="info-line">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
       4.0 GPA | 97% Average
     </span>
+
+    <div class="sidebar-section-title">Experience</div>
+    <div class="sidebar-experience">
+      <div class="sidebar-experience-item"><span class="role">Executive</span> &middot; <a href="https://www.mathattacksociety.org" target="_blank">Math Attack Society</a> <span class="date">2025-Present</span></div>
+      <div class="sidebar-experience-item"><span class="role">Executive</span> &middot; <a href="https://archallenge.org" target="_blank">Alpine Reasoning Challenge</a> <span class="date">2025-Present</span></div>
+      <div class="sidebar-experience-item"><span class="role">Entrepreneur</span> &middot; eBay Business <span class="date">2024-2026</span></div>
+      <div class="sidebar-experience-item"><span class="role">Co-President</span> &middot; Chess Club <span class="date">2023-2025</span></div>
+    </div>
+
     <div class="email-row">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
       <a href="mailto:dannywang930@gmail.com">dannywang930@gmail.com</a>
@@ -298,10 +325,9 @@ ul { list-style: none; }
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Download Resume
     </a>
+    <a href="../index.html" class="sidebar-link">&larr; Portfolio</a>
   </div>
 </aside>
-
-<!-- ===== MAIN ===== -->
 <main class="main">
 
   <section class="section">
