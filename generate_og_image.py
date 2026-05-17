@@ -1,5 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont
-import os, math, random
+import os, math
 
 WIDTH, HEIGHT = 1200, 630
 
@@ -23,10 +23,6 @@ for y in range(HEIGHT):
         r = int((10 + ripple * 25 + pulse * 15) * falloff)
         g = int((40 + ripple * 60 + pulse * 50) * falloff)
         b = int((80 + ripple * 90 + pulse * 70) * falloff)
-
-        r = max(0, min(255, r + random.randint(-3, 3)))
-        g = max(0, min(255, g + random.randint(-3, 3)))
-        b = max(0, min(255, b + random.randint(-3, 3)))
 
         draw.point((x, y), fill=(r, g, b))
 
@@ -52,5 +48,5 @@ draw.text((80, 420), "dannywang.dev", fill=(120, 180, 220), font=font_url)
 draw.rectangle([80, 288, 200, 294], fill=(100, 200, 255))
 
 out_path = os.path.join(os.path.dirname(__file__), "portfolio-preview.png")
-img.save(out_path, "PNG")
+img.save(out_path, "PNG", optimize=True)
 print(f"Saved to {out_path}")
