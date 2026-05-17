@@ -1321,7 +1321,7 @@ ul { list-style: none; }
   <section class="section" id="research">
     <h2 class="section-title">Research</h2>
     <div class="about-text">
-      <p><strong>Cosine Similarity Distillation (CSD) - Teacher-Free Knowledge Distillation via Random Projection Fingerprints</strong> (2025-present)</p>
+      <p><strong>Cosine Similarity Distillation (CSD) - Teacher-Free Knowledge Transfer via Random Projection Fingerprints</strong> (2025-present)</p>
       <div class="project-tags"><span class="project-tag project-tag-research">Independent Research</span></div>
       <p>A novel distillation method that eliminates the need for live teacher model forwarding during student training. Instead of loading the teacher at every batch, CSD precomputes compact "fingerprints", which are the cosine similarities between the teacher's normalized intermediate features and the columns of a frozen random reference matrix. During student training, the student then regresses these fingerprints alongside the classification loss, achieving competitive accuracy with 67x smaller storage and a single teacher forward pass compared to traditional KD or FitNet distillation methods. Built in PyTorch on CIFAR-100 with ResNet architectures, featuring augmentation-aware fingerprint generation, cosine similarity loss, and lambda warmup. Demonstrated per-class fingerprints as small as 50 KB. Paper is currently a work in progress.</p>
 
