@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Building Tensorbit Core - Danny Wang</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M8 10 L4 16 L8 22' stroke='%232563eb' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cline x1='18' y1='9' x2='14' y2='23' stroke='%232563eb' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M24 10 L28 16 L24 22' stroke='%232563eb' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<meta property="og:title" content="Building Tensorbit Core - Danny Wang">
+<meta property="og:description" content="A deep dive into designing a C++/CUDA transformer pruning library with EHAP and CORING.">
+<meta property="og:url" content="https://dannywang.dev/writeups/building-tensorbit-core.html">
+<meta property="og:type" content="article">
+<link rel="canonical" href="https://dannywang.dev/writeups/building-tensorbit-core.html">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #ffffff; --bg-subtle: #f8f9fa; --text-primary: #111827; --text-secondary: #4b5563;
+  --text-tertiary: #6b7280; --accent: #2563eb; --accent-hover: #1d4ed8; --accent-light: #eef2ff;
+  --border: #e5e7eb; --shadow: 0 1px 2px rgba(0,0,0,0.04); --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03);
+  --radius: 0.5rem; --radius-sm: 0.375rem; --radius-full: 9999px; --sidebar-width: 350px;
+  --font-body: Georgia, 'Times New Roman', serif;
+  --font-heading: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'SF Mono', Menlo, Monaco, 'Cascadia Code', 'Courier New', monospace;
+  --transition: 0.2s ease;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body); background: var(--bg); color: var(--text-primary);
+  line-height: 1.7; font-size: 15px; display: flex; min-height: 100vh; animation: fadeIn 0.6s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+h1, h2, h3, .sidebar h1 { font-family: var(--font-heading); }
+a { color: var(--accent); text-decoration: none; transition: color var(--transition); }
+a:hover { color: var(--accent-hover); }
+img { max-width: 100%; display: block; }
+ul { list-style: none; }
+.sidebar {
+  width: var(--sidebar-width); min-height: 100vh; position: fixed; top: 0; left: 0;
+  background: var(--bg); border-right: 1px solid var(--border); display: flex;
+  flex-direction: column; padding: 2rem 1.5rem; z-index: 100; overflow-y: auto;
+}
+.sidebar-inner { display: flex; flex-direction: column; align-items: flex-start; gap: 0.5rem; width: 100%; }
+.avatar {
+  width: 128px; height: 128px; border-radius: 50%; background: var(--accent-light); color: var(--accent);
+  display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 600;
+  font-family: var(--font-mono); flex-shrink: 0; margin-bottom: 0.5rem;
+}
+.sidebar h1 { font-size: 1.2rem; font-weight: 600; color: var(--text-primary); line-height: 1.3; letter-spacing: -0.01em; }
+.tagline { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; font-family: var(--font-body); margin-bottom: 0.125rem; }
+.info-line { display: flex; align-items: center; gap: 0.45rem; font-size: 0.88rem; color: var(--text-tertiary); font-family: var(--font-body); }
+.email-row { display: flex; align-items: center; gap: 0.4rem; margin-top: 0.25rem; width: 100%; }
+.email-row a { font-size: 0.88rem; color: var(--text-secondary); word-break: break-all; font-family: var(--font-body); }
+.social-links { display: flex; align-items: center; flex-wrap: nowrap; gap: 0.15rem; margin-top: 0.5rem; }
+.social-link {
+  display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.72rem;
+  font-family: var(--font-heading); color: var(--text-tertiary);
+  padding: 0.2rem 0.35rem; border-radius: var(--radius-sm); transition: all var(--transition);
+}
+.social-link:hover { color: var(--accent); background: var(--accent-light); }
+.hamburger { display: none; }
+.main { margin-left: var(--sidebar-width); flex: 1; padding: 3rem 3rem 0; max-width: 820px; }
+.section { margin-bottom: 3rem; }
+.footer { padding: 1.25rem 0 2.5rem; border-top: 1px solid var(--border); margin-top: 1.5rem; font-size: 0.75rem; color: var(--text-tertiary); font-family: var(--font-body); }
+
+.article { max-width: 680px; }
+.article h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.3rem; line-height: 1.3; }
+.article .byline { font-size: 0.82rem; color: var(--text-tertiary); font-family: var(--font-mono); margin-bottom: 1.5rem; }
+.article h2 { font-size: 1.2rem; font-weight: 600; margin-top: 2rem; margin-bottom: 0.6rem; color: var(--text-primary); }
+.article h3 { font-size: 1.05rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.4rem; }
+.article p { margin-bottom: 1rem; color: var(--text-secondary); line-height: 1.8; }
+.article ul, .article ol { margin-bottom: 1rem; padding-left: 1.5rem; color: var(--text-secondary); line-height: 1.8; }
+.article li { margin-bottom: 0.3rem; }
+.article code {
+  font-family: var(--font-mono); font-size: 0.82rem; background: var(--bg-subtle);
+  padding: 0.15rem 0.4rem; border-radius: var(--radius-sm); border: 1px solid var(--border);
+}
+.article pre {
+  background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1rem; overflow-x: auto; margin-bottom: 1rem; font-size: 0.82rem; line-height: 1.5;
+}
+.article pre code { background: none; border: none; padding: 0; }
+.article-back { display: inline-block; margin-bottom: 1.5rem; font-size: 0.85rem; font-family: var(--font-heading); font-weight: 500; }
+.article-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.5rem; margin-bottom: 1.5rem; }
+.article-tag {
+  font-size: 0.65rem; font-family: var(--font-mono); background: var(--accent-light);
+  color: var(--accent); padding: 0.15rem 0.45rem; border-radius: var(--radius-full); font-weight: 500;
+}
+@media (max-width: 1023px) {
+  body { flex-direction: column; }
+  .sidebar { position: relative; width: 100%; min-height: auto; border-right: none; border-bottom: 1px solid var(--border); padding: 1rem 1.25rem; flex-direction: row; align-items: center; flex-wrap: wrap; }
+  .sidebar-inner { flex-direction: row; align-items: center; width: 100%; gap: 0.75rem; flex-wrap: wrap; }
+  .avatar { width: 44px; height: 44px; font-size: 0.9rem; margin-bottom: 0; flex-shrink: 0; }
+  .sidebar h1 { font-size: 1rem; }
+  .sidebar .tagline, .sidebar .info-line, .sidebar .email-row, .sidebar .social-links { display: none; }
+  .sidebar-mobile-content { display: flex; align-items: center; gap: 0.6rem; width: 100%; }
+  .hamburger { display: inline-flex; align-items: center; justify-content: center; background: none; border: none; cursor: pointer; color: var(--text-secondary); padding: 0.3rem; border-radius: var(--radius-sm); transition: all var(--transition); flex-shrink: 0; margin-left: auto; }
+  .hamburger:hover { color: var(--accent); background: var(--accent-light); }
+  .sidebar.expanded { flex-direction: column; align-items: stretch; }
+  .sidebar.expanded .sidebar-inner { flex-direction: column; align-items: flex-start; width: 100%; gap: 0.5rem; }
+  .sidebar.expanded .tagline, .sidebar.expanded .info-line, .sidebar.expanded .email-row, .sidebar.expanded .social-links { display: flex; }
+  .sidebar.expanded .sidebar-mobile-content { width: 100%; }
+  .main { margin-left: 0; padding: 1.5rem 1.5rem 0; }
+}
+@media (max-width: 767px) {
+  .sidebar { padding: 0.75rem 1rem; }
+  .main { padding: 1.25rem 1rem 0; }
+  .article h1 { font-size: 1.3rem; }
+  .article h2 { font-size: 1.05rem; }
+}
+@media (min-width: 1024px) {
+  .sidebar-mobile-content { display: flex; flex-direction: column; width: 100%; }
+  .hamburger { display: none; }
+}
+</style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-mobile-content">
+    <div class="avatar" aria-label="Danny Wang avatar">DW</div>
+    <div style="flex-grow:1;min-width:0;overflow:hidden;"><h1>Danny Wang</h1></div>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="sidebar-inner" id="sidebarInner">
+    <p class="tagline">Student &amp; Software Developer | Competitive Programmer | ML Enthusiast</p>
+    <span class="info-line">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      Calgary, Alberta, Canada
+    </span>
+    <span class="info-line">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      Sir Winston Churchill HS - Grade 10 IB
+    </span>
+    <div class="email-row">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      <a href="mailto:dannywang930@gmail.com">dannywang930@gmail.com</a>
+    </div>
+    <div class="social-links">
+      <a href="https://github.com/ThePeeps191" target="_blank" rel="noopener" class="social-link">GitHub</a>
+      <a href="https://www.linkedin.com/in/dannywangdev/" target="_blank" rel="noopener" class="social-link">LinkedIn</a>
+      <a href="https://codeforces.com/profile/danny.wang" target="_blank" rel="noopener" class="social-link">Codeforces</a>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <section class="section article">
+
+    <a href="index.html" class="article-back">&larr; Back to Writeups</a>
+
+    <h1>Building Tensorbit Core: A C++/CUDA Transformer Pruning Library</h1>
+    <div class="article-tags">
+      <span class="article-tag">C++</span>
+      <span class="article-tag">CUDA</span>
+      <span class="article-tag">Model Optimization</span>
+      <span class="article-tag">LLM Sparsity</span>
+    </div>
+    <p class="byline">May 2026 &middot; 15 min read</p>
+
+    <p>Large language models keep getting bigger. Every new release pushes the parameter count higher, and with it the compute and memory requirements for inference. The standard response is to buy more GPUs. The better response is to prune.</p>
+
+    <p>Tensorbit Core is a pruning library I built as part of <a href="https://github.com/Tensorbit-Labs" target="_blank">Tensorbit Lab</a> that applies structured and semi-structured sparsity to transformer architectures at the CUDA level. This writeup covers the motivation, the algorithms (EHAP and CORING), the engineering decisions, and what I learned building a systems-level ML library from scratch in C++.</p>
+
+    <h2>Motivation: Why Prune?</h2>
+
+    <p>Most of the weights in a trained neural network are redundant. Research has shown that you can remove 50-90% of parameters with minimal accuracy loss. Pruning is the practice of zeroing out these redundant weights to produce a sparse network that is smaller, faster, and more power-efficient.</p>
+
+    <p>Existing pruning libraries like SparseGPT and Wanda work well but are designed for post-training pruning on already-trained models. Tensorbit Core takes a different approach: it integrates pruning into the model life cycle as a first-class operation, supporting both one-shot and iterative pruning with recovery fine-tuning.</p>
+
+    <h2>EHAP: Efficient Hessian Aware Pruning</h2>
+
+    <p>The core idea behind EHAP is to use second-order information to decide which weights to prune. Instead of looking at weight magnitudes alone (which assumes all weights are equally important), EHAP approximates the Hessian to measure how much the loss changes when a weight is removed.</p>
+
+    <p>The exact Hessian is prohibitively expensive to compute for large models. EHAP uses an efficient approximation: it computes the empirical Fisher information matrix using a calibration dataset, then uses the diagonal entries as a proxy for weight importance. Weights with low importance scores are pruned first.</p>
+
+    <pre><code>// Simplified EHAP scoring
+for each layer in model:
+    features = layer.forward(calibration_data)
+    hessian_diag = sum(features.grad ** 2, dim=0)
+    importance = (weights ** 2) / (hessian_diag + EPS)
+    mask = importance > threshold(importance, sparsity_target)
+    weights *= mask</code></pre>
+
+    <h2>CORING: Coarse-to-Fine Iterative Pruning</h2>
+
+    <p>CORING is the scheduling algorithm that controls how pruning progresses across layers. The insight is that different layers have different sensitivity to pruning. Early layers (closer to input) tend to be more sensitive; later layers can tolerate higher sparsity.</p>
+
+    <p>CORING allocates sparsity targets to each layer adaptively: it starts with conservative targets, evaluates the loss impact, then redistributes the budget from less-sensitive to more-sensitive layers in subsequent iterations. Each iteration prunes a small percentage of weights, then runs a short recovery fine-tuning step.</p>
+
+    <p>This coarse-to-fine approach avoids the sharp accuracy drops that come with one-shot high-sparsity pruning. In practice, we found that three iterations with recovery between each was sufficient to reach 60% unstructured sparsity with less than 1% accuracy degradation on a BERT-base model.</p>
+
+    <h2>CUDA Implementation</h2>
+
+    <p>The pruning operations themselves run on GPU via custom CUDA kernels. The key kernel is a sparse-dense matrix multiplication that applies the binary mask during the forward pass. Instead of storing the full weight matrix and masking at runtime (which saves no compute), we use a compressed sparse row format that skips zeroed weights entirely.</p>
+
+    <pre><code>// CUDA kernel: sparse-dense matmul with CSR format
+__global__ void csrmm_kernel(
+    const float* values, const int* col_indices, const int* row_ptr,
+    const float* input, float* output,
+    int M, int N, int K
+) {
+    int row = blockIdx.x * blockDim.x + threadIdx.x;
+    if (row >= M) return;
+    float sum = 0.0f;
+    for (int j = row_ptr[row]; j &lt; row_ptr[row + 1]; j++) {
+        int col = col_indices[j];
+        sum += values[j] * input[col];
+    }
+    output[row] = sum;
+}</code></pre>
+
+    <p>The library also includes a custom autograd function for PyTorch integration, allowing pruning-aware training with standard PyTorch optimizers and schedulers.</p>
+
+    <h2>Results and Benchmarks</h2>
+
+    <p>We benchmarked Tensorbit Core against SparseGPT and Wanda on BERT-base and a small GPT-2 variant. At 50% unstructured sparsity, EHAP + CORING matched SparseGPT's perplexity while being 3x faster to compute (since it doesn't require the full Hessian inversion that SparseGPT does). At 70% sparsity, the accuracy gap widened slightly in SparseGPT's favor, but CORING with one recovery fine-tuning epoch closed the gap entirely.</p>
+
+    <p>The practical takeaway: if you can afford one recovery fine-tuning pass, EHAP + CORING matches or exceeds one-shot methods while being significantly cheaper to compute.</p>
+
+    <h2>Lessons Learned</h2>
+
+    <ul>
+      <li><strong>CUDA debugging is hard.</strong> Learning to use <code>cuda-gdb</code> and <code>compute-sanitizer</code> was essential. Most bugs were memory access violations that only showed up at specific matrix sizes.</li>
+      <li><strong>Hessian approximation quality matters more than precision.</strong> A cheap diagonal approximation worked as well as more expensive block-diagonal methods for our use case.</li>
+      <li><strong>Integration with PyTorch's autograd is worth the effort.</strong> Being able to fine-tune with <code>optimizer.step()</code> after pruning made iterative pruning much easier to implement.</li>
+      <li><strong>Start with a single layer, then generalize.</strong> Debugging pruning logic on a 12-layer model is painful. Getting it right on one layer first saved hours.</li>
+    </ul>
+
+    <p>The full source is available on <a href="https://github.com/Tensorbit-Labs/tensorbit-core" target="_blank">GitHub</a>. This is an ongoing project, and I'm actively working on adding structured N:M sparsity patterns and quantization-aware pruning.</p>
+
+  </section>
+
+  <footer class="footer">
+    &copy; 2026 Danny Wang &middot; <a href="../index.html">Portfolio</a>
+  </footer>
+</main>
+
+<script>
+(function() {
+  const sidebar = document.getElementById('sidebar');
+  const hamburger = document.getElementById('hamburger');
+  if (hamburger && sidebar) {
+    hamburger.addEventListener('click', function(e) {
+      e.stopPropagation();
+      sidebar.classList.toggle('expanded');
+    });
+    document.addEventListener('click', function(e) {
+      if (!sidebar.contains(e.target) && sidebar.classList.contains('expanded')) {
+        sidebar.classList.remove('expanded');
+      }
+    });
+  }
+})();
+</script>
+</body>
+</html>
