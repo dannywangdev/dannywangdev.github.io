@@ -71,11 +71,40 @@ ul { list-style: none; }
 .sidebar-experience-item a, .sidebar-experience-item a:visited { color: inherit; text-decoration: none; cursor: default; }
 .sidebar-experience-item a:hover { text-decoration: underline; cursor: pointer; }
 
-.sidebar-link {
+.sidebar-link,
+.sidebar-link:visited {
   display: inline-block; font-size: 0.78rem; font-family: var(--font-heading);
   color: var(--text-tertiary); text-decoration: none; margin-top: 0.6rem; transition: color var(--transition);
 }
 .sidebar-link:hover { color: var(--accent); }
+
+.copy-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: none; border: none; cursor: pointer;
+  color: var(--text-tertiary); padding: 0.2rem; border-radius: var(--radius-sm);
+  transition: all var(--transition); position: relative; flex-shrink: 0;
+}
+.copy-btn:hover { color: var(--accent); background: var(--accent-light); }
+
+.copy-tooltip {
+  position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+  background: var(--text-primary); color: #fff; font-size: 0.68rem; padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm); white-space: nowrap;
+  opacity: 0; pointer-events: none; transition: opacity var(--transition); font-family: var(--font-heading);
+}
+.copy-tooltip.show { opacity: 1; }
+
+.resume-btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: var(--accent); color: #fff; font-size: 0.88rem; font-weight: 500;
+  font-family: var(--font-heading); padding: 0.5rem 1.1rem; border-radius: var(--radius);
+  border: none; cursor: pointer; transition: background var(--transition); margin-top: 0.5rem;
+}
+.resume-btn:hover { background: var(--accent-hover); color: #fff; }
+
+.email-row a:hover { color: var(--accent); }
+.info-line svg { flex-shrink: 0; }
+
 .section { margin-bottom: 3rem; }
 .footer { padding: 1.25rem 0 2.5rem; border-top: 1px solid var(--border); margin-top: 1.5rem; font-size: 0.75rem; color: var(--text-tertiary); font-family: var(--font-body); }
 
@@ -288,6 +317,35 @@ Loss = CE(logits, labels) + lambda * (1 - cos_sim(phi_S, phi_T))</code></pre>
       }
     });
   }
+
+  document.querySelectorAll('.copy-btn').forEach(function(btn) {
+    btn.addEventListener('click', async function() {
+      const email = btn.getAttribute('data-email');
+      if (!email) return;
+      try {
+        await navigator.clipboard.writeText(email);
+        const tooltip = btn.querySelector('.copy-tooltip');
+        if (tooltip) {
+          tooltip.classList.add('show');
+          setTimeout(function() { tooltip.classList.remove('show'); }, 1800);
+        }
+      } catch (err) {
+        const textarea = document.createElement('textarea');
+        textarea.value = email;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        const tooltip = btn.querySelector('.copy-tooltip');
+        if (tooltip) {
+          tooltip.classList.add('show');
+          setTimeout(function() { tooltip.classList.remove('show'); }, 1800);
+        }
+      }
+    });
+  });
 })();
 </script>
 </body>
