@@ -834,6 +834,72 @@ ul { list-style: none; }
   .hamburger { display: none; }
 }
 
+/* ===== CF Stats Widget ===== */
+.cf-widget {
+  display: none;
+  position: fixed;
+  width: 280px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem;
+  z-index: 200;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.cf-widget-title {
+  font-size: 0.65rem;
+  font-weight: 600;
+  font-family: var(--font-heading);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.6rem;
+}
+
+.cf-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.25rem 0;
+  font-size: 0.8rem;
+  font-family: var(--font-body);
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+}
+.cf-row:last-child { border-bottom: none; }
+
+.cf-label { color: var(--text-tertiary); font-size: 0.72rem; font-family: var(--font-heading); }
+.cf-value { font-weight: 600; font-family: var(--font-mono); font-size: 0.85rem; }
+.cf-value.rating-legend { color: #bb0000; }
+.cf-value.rating-master { color: #aa00aa; }
+.cf-value.rating-expert { color: #0000ff; }
+.cf-value.rating-spec { color: #03a89e; }
+.cf-value.rating-pupil { color: #008000; }
+.cf-value.rating-newbie { color: #808080; }
+
+.cf-contest-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  padding: 0.2rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.cf-contest-item:last-child { border-bottom: none; }
+.cf-contest-rank { color: var(--text-tertiary); }
+.cf-contest-delta { font-weight: 600; }
+.cf-contest-delta.pos { color: #008000; }
+.cf-contest-delta.neg { color: #bb0000; }
+
+.cf-loading {
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  font-family: var(--font-body);
+  padding: 0.3rem 0;
+}
+
 /* ===== Print ===== */
 @media print {
   body { display: block; font-size: 11pt; color: #000; background: #fff; }
@@ -994,7 +1060,7 @@ ul { list-style: none; }
       <div class="achievement-col">
         <h3 class="achievement-col-title">Competitive Programming</h3>
         <ul class="achievement-list">
-          <li><strong>1842</strong> <a href="https://codeforces.com/profile/danny.wang" target="_blank">Codeforces</a> Rating (top ~4% worldwide)</li>
+          <li><strong>1842</strong> <a href="https://codeforces.com/profile/danny.wang" target="_blank" id="cfLink">Codeforces</a> Rating (top ~4% worldwide)</li>
           <li><strong>Gold</strong> USACO Division</li>
           <li><strong>Group 2</strong> CCC Senior and 3 Certificates of Distinction</li>
           <li><strong>2000+</strong> problems solved across Codeforces, LeetCode, DMOJ, and more</li>
@@ -1464,6 +1530,13 @@ ul { list-style: none; }
 
 </main>
 
+<div class="cf-widget" id="cfWidget">
+  <div class="cf-widget-title">Codeforces Stats</div>
+  <div id="cfContent">
+    <div class="cf-loading">Loading...</div>
+  </div>
+</div>
+
 <script>
 (function() {
   'use strict';
@@ -1598,6 +1671,101 @@ ul { list-style: none; }
       else goToSlide(currentIndex - 1);
     }
   }
+
+  // ===== CODEFORCES STATS =====
+  (function() {
+    var widget = document.getElementById('cfWidget');
+    var content = document.getElementById('cfContent');
+    var cfLink = document.getElementById('cfLink');
+    if (!widget || !content) return;
+
+    var hideTimer = null;
+    if (cfLink) {
+      cfLink.addEventListener('mouseenter', function() {
+        if (hideTimer) clearTimeout(hideTimer);
+        var rect = cfLink.getBoundingClientRect();
+        widget.style.left = Math.min(rect.left - 20, window.innerWidth - 310) + 'px';
+        widget.style.top = (rect.bottom + 8) + 'px';
+        widget.style.display = 'block';
+      });
+      cfLink.addEventListener('mouseleave', function() {
+        hideTimer = setTimeout(function() { widget.style.display = 'none'; }, 200);
+      });
+      widget.addEventListener('mouseenter', function() {
+        if (hideTimer) clearTimeout(hideTimer);
+      });
+      widget.addEventListener('mouseleave', function() {
+        widget.style.display = 'none';
+      });
+    }
+
+    var stored = localStorage.getItem('cf_stats');
+    var cached = stored ? JSON.parse(stored) : null;
+    if (cached && Date.now() - cached.ts < 1800000) {
+      renderCF(content, cached.data);
+    } else {
+      var userData = null, ratingData = null;
+      var loaded = 0;
+      function done() {
+        loaded++;
+        if (loaded === 2) {
+          var data = { user: userData, rating: ratingData };
+          renderCF(content, data);
+          try { localStorage.setItem('cf_stats', JSON.stringify({ data: data, ts: Date.now() })); } catch(e) {}
+        }
+      }
+      fetch('https://codeforces.com/api/user.info?handles=danny.wang')
+        .then(function(r) { return r.json(); })
+        .then(function(j) { userData = j.result ? j.result[0] : null; done(); })
+        .catch(function() { done(); });
+      fetch('https://codeforces.com/api/user.rating?handle=danny.wang')
+        .then(function(r) { return r.json(); })
+        .then(function(j) { ratingData = j.result || null; done(); })
+        .catch(function() { done(); });
+      setTimeout(function() {
+        if (loaded < 2 && cached) renderCF(content, cached.data);
+        else if (loaded < 2) content.innerHTML = '<div class="cf-loading">Unable to load stats.</div>';
+      }, 5000);
+    }
+
+    function renderCF(container, data) {
+      if (!data || !data.user) {
+        container.innerHTML = '<div class="cf-loading">Unable to load stats.</div>';
+        return;
+      }
+      var u = data.user;
+      var rating = u.rating || 0;
+      var maxRating = u.maxRating || 0;
+      var rank = u.rank || 'unrated';
+      var ratingClass = 'rating-newbie';
+      if (rating >= 2400) ratingClass = 'rating-legend';
+      else if (rating >= 2100) ratingClass = 'rating-master';
+      else if (rating >= 1600) ratingClass = 'rating-expert';
+      else if (rating >= 1400) ratingClass = 'rating-spec';
+      else if (rating >= 1200) ratingClass = 'rating-pupil';
+
+      var html = '';
+      html += '<div class="cf-row"><span class="cf-label">Rating</span><span class="cf-value ' + ratingClass + '">' + rating + '</span></div>';
+      html += '<div class="cf-row"><span class="cf-label">Max</span><span class="cf-value ' + ratingClass + '">' + maxRating + '</span></div>';
+      html += '<div class="cf-row"><span class="cf-label">Rank</span><span class="cf-value" style="text-transform:capitalize;">' + rank + '</span></div>';
+
+      if (data.rating && data.rating.length > 0) {
+        html += '<div style="margin-top:0.5rem;"><div class="cf-widget-title">Recent</div>';
+        var contests = data.rating.slice(-5).reverse();
+        for (var i = 0; i < contests.length; i++) {
+          var c = contests[i];
+          var delta = c.newRating - c.oldRating;
+          var deltaClass = delta >= 0 ? 'pos' : 'neg';
+          var deltaSign = delta >= 0 ? '+' : '';
+          var name = c.contestName;
+          if (name.length > 18) name = name.substring(0, 18) + '...';
+          html += '<div class="cf-contest-item"><span>' + name + '</span><span><span class="cf-contest-rank">' + c.rank + '</span> <span class="cf-contest-delta ' + deltaClass + '">(' + deltaSign + delta + ')</span></span></div>';
+        }
+        html += '</div>';
+      }
+      container.innerHTML = html;
+    }
+  })();
 
   // ===== INIT =====
   initCarousel();
