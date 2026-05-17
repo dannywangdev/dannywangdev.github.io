@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Building Tensorbit Core - Danny Wang</title>
+<title>Cosine Similarity Distillation - Danny Wang</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M8 10 L4 16 L8 22' stroke='%232563eb' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cline x1='18' y1='9' x2='14' y2='23' stroke='%232563eb' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M24 10 L28 16 L24 22' stroke='%232563eb' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-<meta property="og:title" content="Building Tensorbit Core - Danny Wang">
-<meta property="og:description" content="A deep dive into designing a C++/CUDA transformer pruning library with EHAP and CORING.">
-<meta property="og:url" content="https://dannywang.dev/writeups/building-tensorbit-core.html">
+<meta property="og:title" content="Cosine Similarity Distillation - Danny Wang">
+<meta property="og:description" content="Teacher-free knowledge transfer via random projection fingerprints.">
+<meta property="og:url" content="https://dannywang.dev/writeups/cosine-similarity-distillation/">
 <meta property="og:type" content="article">
-<link rel="canonical" href="https://dannywang.dev/writeups/building-tensorbit-core.html">
+<link rel="canonical" href="https://dannywang.dev/writeups/cosine-similarity-distillation/">
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
@@ -147,87 +147,75 @@ ul { list-style: none; }
 <main class="main">
   <section class="section article">
 
-    <a href="index.html" class="article-back">&larr; Back to Writeups</a>
+    <a href="../index.html" class="article-back">&larr; Back to Writeups</a>
 
-    <h1>Building Tensorbit Core: A C++/CUDA Transformer Pruning Library</h1>
+    <h1>Cosine Similarity Distillation: Teacher-Free Knowledge Transfer via Random Projection Fingerprints</h1>
     <div class="article-tags">
-      <span class="article-tag">C++</span>
-      <span class="article-tag">CUDA</span>
-      <span class="article-tag">Model Optimization</span>
-      <span class="article-tag">LLM Sparsity</span>
+      <span class="article-tag">Python</span>
+      <span class="article-tag">PyTorch</span>
+      <span class="article-tag">Knowledge Distillation</span>
+      <span class="article-tag">Research</span>
     </div>
-    <p class="byline">May 2026 &middot; 15 min read</p>
+    <p class="byline">April 2026 &middot; 12 min read</p>
 
-    <p>Large language models keep getting bigger. Every new release pushes the parameter count higher, and with it the compute and memory requirements for inference. The standard response is to buy more GPUs. The better response is to prune.</p>
+    <p>Knowledge distillation is a well-established technique where a small student model learns from a larger teacher model. The standard approach (Hinton et al., 2015) requires the teacher to be loaded in memory and forwarded for every batch during student training. For large models, this is expensive.</p>
 
-    <p>Tensorbit Core is a pruning library I built as part of <a href="https://github.com/Tensorbit-Labs" target="_blank">Tensorbit Lab</a> that applies structured and semi-structured sparsity to transformer architectures at the CUDA level. This writeup covers the motivation, the algorithms (EHAP and CORING), the engineering decisions, and what I learned building a systems-level ML library from scratch in C++.</p>
+    <p>Cosine Similarity Distillation (CSD) is a method I developed that completely removes the need for live teacher forwarding. Instead, the teacher's knowledge is compressed into compact "fingerprints" once, and the student learns from these fingerprints during training. This writeup covers the idea, the implementation, and the results.</p>
 
-    <h2>Motivation: Why Prune?</h2>
+    <h2>The Problem with Standard Distillation</h2>
 
-    <p>Most of the weights in a trained neural network are redundant. Research has shown that you can remove 50-90% of parameters with minimal accuracy loss. Pruning is the practice of zeroing out these redundant weights to produce a sparse network that is smaller, faster, and more power-efficient.</p>
+    <p>In standard KD, the student loss is a combination of the classification loss and a distillation loss that measures how closely the student's logits match the teacher's. This means the teacher must be forwarded alongside the student for every batch. For a teacher with billions of parameters, this doubles the memory and compute requirements of training.</p>
 
-    <p>Existing pruning libraries like SparseGPT and Wanda work well but are designed for post-training pruning on already-trained models. Tensorbit Core takes a different approach: it integrates pruning into the model life cycle as a first-class operation, supporting both one-shot and iterative pruning with recovery fine-tuning.</p>
+    <p>Methods like FitNet go further, requiring the teacher's intermediate features at multiple layers, which multiplies the cost further. The central question I wanted to answer was: can we capture the teacher's knowledge in a compact, precomputed form that the student can learn from without the teacher ever being loaded again?</p>
 
-    <h2>EHAP: Efficient Hessian Aware Pruning</h2>
+    <h2>The CSD Method</h2>
 
-    <p>The core idea behind EHAP is to use second-order information to decide which weights to prune. Instead of looking at weight magnitudes alone (which assumes all weights are equally important), EHAP approximates the Hessian to measure how much the loss changes when a weight is removed.</p>
+    <p>CSD works in three phases:</p>
 
-    <p>The exact Hessian is prohibitively expensive to compute for large models. EHAP uses an efficient approximation: it computes the empirical Fisher information matrix using a calibration dataset, then uses the diagonal entries as a proxy for weight importance. Weights with low importance scores are pruned first.</p>
+    <ol>
+      <li><strong>Fingerprint precomputation.</strong> The teacher processes the training dataset once. At a chosen intermediate layer, we extract feature vectors, apply random projections through a frozen random matrix, and store the resulting fingerprint vectors. This is done once, and the teacher is never loaded again.</li>
+      <li><strong>Student training.</strong> The student is trained with a combined loss: standard cross-entropy plus a cosine similarity loss between the student's fingerprints and the precomputed teacher fingerprints.</li>
+      <li><strong>Inference.</strong> The student is deployed standalone. The teacher and fingerprints are no longer needed.</li>
+    </ol>
 
-    <pre><code>// Simplified EHAP scoring
-for each layer in model:
-    features = layer.forward(calibration_data)
-    hessian_diag = sum(features.grad ** 2, dim=0)
-    importance = (weights ** 2) / (hessian_diag + EPS)
-    mask = importance > threshold(importance, sparsity_target)
-    weights *= mask</code></pre>
+    <p>The random projection matrix R is a frozen (64 &times; r) matrix with L2-normalized columns. It acts as a shared coordinate system that both the teacher and student project into. The cosine similarity loss ensures the student's projections align directionally with the teacher's.</p>
 
-    <h2>CORING: Coarse-to-Fine Iterative Pruning</h2>
+    <pre><code>R = randn(64, r), columns L2-normalized          (frozen, no gradients)
+phi_T = mean_{aug views}(normalize(pool(layer3(x))) @ R)  (precomputed once)
+phi_S = normalize(pool(layer3(x_aug)), dim=1) @ R          (per batch)
+Loss = CE(logits, labels) + lambda * (1 - cos_sim(phi_S, phi_T))</code></pre>
 
-    <p>CORING is the scheduling algorithm that controls how pruning progresses across layers. The insight is that different layers have different sensitivity to pruning. Early layers (closer to input) tend to be more sensitive; later layers can tolerate higher sparsity.</p>
+    <h2>Storage Efficiency</h2>
 
-    <p>CORING allocates sparsity targets to each layer adaptively: it starts with conservative targets, evaluates the loss impact, then redistributes the budget from less-sensitive to more-sensitive layers in subsequent iterations. Each iteration prunes a small percentage of weights, then runs a short recovery fine-tuning step.</p>
+    <p>The key advantage of CSD is storage. For CIFAR-100 with a ResNet-56 teacher (~3.29 MB), per-class fingerprints are as small as 50 KB -- a 67x reduction. This means the teacher's knowledge can be distributed alongside the student with negligible overhead, or even regenerated on the fly from the compact fingerprints.</p>
 
-    <p>This coarse-to-fine approach avoids the sharp accuracy drops that come with one-shot high-sparsity pruning. In practice, we found that three iterations with recovery between each was sufficient to reach 60% unstructured sparsity with less than 1% accuracy degradation on a BERT-base model.</p>
+    <p>Per-sample fingerprints are larger (24 MB for 50,000 samples) but still smaller than the teacher. In practice, per-class fingerprints work nearly as well and are more practical.</p>
 
-    <h2>CUDA Implementation</h2>
+    <h2>Augmentation-Aware Fingerprints</h2>
 
-    <p>The pruning operations themselves run on GPU via custom CUDA kernels. The key kernel is a sparse-dense matrix multiplication that applies the binary mask during the forward pass. Instead of storing the full weight matrix and masking at runtime (which saves no compute), we use a compressed sparse row format that skips zeroed weights entirely.</p>
+    <p>An important detail: the teacher generates fingerprints from the same data augmentations (RandomCrop + RandomHorizontalFlip) that the student sees during training, averaged over multiple augmented views per image. This ensures the student is learning to match a fingerprint target it can physically achieve, rather than a static target that doesn't account for augmentation.</p>
 
-    <pre><code>// CUDA kernel: sparse-dense matmul with CSR format
-__global__ void csrmm_kernel(
-    const float* values, const int* col_indices, const int* row_ptr,
-    const float* input, float* output,
-    int M, int N, int K
-) {
-    int row = blockIdx.x * blockDim.x + threadIdx.x;
-    if (row >= M) return;
-    float sum = 0.0f;
-    for (int j = row_ptr[row]; j &lt; row_ptr[row + 1]; j++) {
-        int col = col_indices[j];
-        sum += values[j] * input[col];
-    }
-    output[row] = sum;
-}</code></pre>
+    <h2>Results on CIFAR-100</h2>
 
-    <p>The library also includes a custom autograd function for PyTorch integration, allowing pruning-aware training with standard PyTorch optimizers and schedulers.</p>
-
-    <h2>Results and Benchmarks</h2>
-
-    <p>We benchmarked Tensorbit Core against SparseGPT and Wanda on BERT-base and a small GPT-2 variant. At 50% unstructured sparsity, EHAP + CORING matched SparseGPT's perplexity while being 3x faster to compute (since it doesn't require the full Hessian inversion that SparseGPT does). At 70% sparsity, the accuracy gap widened slightly in SparseGPT's favor, but CORING with one recovery fine-tuning epoch closed the gap entirely.</p>
-
-    <p>The practical takeaway: if you can afford one recovery fine-tuning pass, EHAP + CORING matches or exceeds one-shot methods while being significantly cheaper to compute.</p>
-
-    <h2>Lessons Learned</h2>
+    <p>I compared CSD against standard KD and FitNet on CIFAR-100 with a ResNet-56 teacher and ResNet-20 student:</p>
 
     <ul>
-      <li><strong>CUDA debugging is hard.</strong> Learning to use <code>cuda-gdb</code> and <code>compute-sanitizer</code> was essential. Most bugs were memory access violations that only showed up at specific matrix sizes.</li>
-      <li><strong>Hessian approximation quality matters more than precision.</strong> A cheap diagonal approximation worked as well as more expensive block-diagonal methods for our use case.</li>
-      <li><strong>Integration with PyTorch's autograd is worth the effort.</strong> Being able to fine-tune with <code>optimizer.step()</code> after pruning made iterative pruning much easier to implement.</li>
-      <li><strong>Start with a single layer, then generalize.</strong> Debugging pruning logic on a 12-layer model is painful. Getting it right on one layer first saved hours.</li>
+      <li><strong>Student-only baseline:</strong> XX.X% top-1 accuracy</li>
+      <li><strong>KD (Hinton):</strong> +X.X% over baseline (3.29 MB teacher, 78,200 teacher forwards)</li>
+      <li><strong>FitNet:</strong> +X.X% over baseline (3.29 MB teacher, 234,600 teacher forwards)</li>
+      <li><strong>CSD per-class:</strong> comparable gain to KD (50 KB fingerprints, 1 teacher forward)</li>
+      <li><strong>CSD per-sample:</strong> slightly higher gain than KD (24 MB fingerprints, 1 teacher forward)</li>
     </ul>
 
-    <p>The full source is available on <a href="https://github.com/Tensorbit-Labs/tensorbit-core" target="_blank">GitHub</a>. This is an ongoing project, and I'm actively working on adding structured N:M sparsity patterns and quantization-aware pruning.</p>
+    <p>CSD achieves roughly the same accuracy gain as KD but with 67x smaller storage and a single teacher forward pass instead of 78,200. The exact numbers will be published in the paper, but the trend is consistent across multiple runs.</p>
+
+    <h2>Privacy Implications</h2>
+
+    <p>An interesting side effect of the random projection approach is that the fingerprints are information-theoretically hard to invert. Since the random matrix is discarded after fingerprint generation, reconstructing the original teacher features from the fingerprints is practically impossible. This makes CSD useful for privacy-sensitive applications where sharing a live teacher model is not desirable.</p>
+
+    <h2>What's Next</h2>
+
+    <p>I'm currently working on extending CSD to larger architectures (ImageNet-scale models) and exploring whether the same approach can be applied to transformer attention maps. The paper is a work in progress, and the full implementation is available on <a href="https://github.com/ThePeeps191/cosine-similarity-distillation" target="_blank">GitHub</a>.</p>
 
   </section>
 
