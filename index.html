@@ -235,6 +235,19 @@ ul { list-style: none; }
 }
 .resume-btn:hover { background: var(--accent-hover); color: #fff; }
 
+.sidebar-link {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-family: var(--font-heading);
+  color: var(--text-tertiary);
+  text-decoration: none;
+  margin-top: 0.6rem;
+  transition: color var(--transition);
+}
+.sidebar-link:hover {
+  color: var(--accent);
+}
+
 .sidebar-section-title {
   font-size: 0.65rem;
   font-weight: 600;
@@ -692,7 +705,8 @@ ul { list-style: none; }
   .sidebar .email-row,
   .sidebar .social-links,
   .sidebar .badge,
-  .sidebar .resume-btn { display: none; }
+  .sidebar .resume-btn,
+  .sidebar .sidebar-link { display: none; }
 
   .sidebar-mobile-content {
     display: flex;
@@ -735,7 +749,8 @@ ul { list-style: none; }
   .sidebar.expanded .email-row,
   .sidebar.expanded .social-links,
   .sidebar.expanded .badge,
-  .sidebar.expanded .resume-btn {
+  .sidebar.expanded .resume-btn,
+  .sidebar.expanded .sidebar-link {
     display: flex;
   }
   .sidebar.expanded .sidebar-mobile-content { width: 100%; }
@@ -789,6 +804,7 @@ ul { list-style: none; }
   .sidebar .social-links,
   .sidebar .badge,
   .sidebar .resume-btn,
+  .sidebar .sidebar-link,
   .sidebar-mobile-content,
   .hamburger { display: flex !important; }
   .main { margin: 0; padding: 1rem 0; max-width: 100%; }
@@ -873,6 +889,8 @@ ul { list-style: none; }
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Download Resume
     </a>
+
+    <a href="writeups/" class="sidebar-link">Writeups &rarr;</a>
   </div>
 </aside>
 
