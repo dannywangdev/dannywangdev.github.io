@@ -113,6 +113,11 @@ body {
   to { opacity: 1; }
 }
 
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 99% { opacity: 0.08; }
+}
+
 h1, h2, h3, .section-title, .sidebar h1, .hero h2, .project-card h3, .contact-email {
   font-family: var(--font-heading);
 }
@@ -1417,7 +1422,6 @@ ul { list-style: none; }
         <span class="skill-tag">Ruby</span>
         <span class="skill-tag">Go</span>
         <span class="skill-tag">C#</span>
-        <span class="skill-tag">Unity</span>
         <span class="skill-tag">Arduino</span>
       </div>
     </div>
@@ -1457,6 +1461,16 @@ ul { list-style: none; }
         <span class="skill-tag">REST API Design</span>
         <span class="skill-tag">Django</span>
         <span class="skill-tag">Node.js / Express</span>
+      </div>
+    </div>
+
+    <div class="skills-group">
+      <div class="skills-group-title">Game Development</div>
+      <div class="skill-tags">
+        <span class="skill-tag">Pygame</span>
+        <span class="skill-tag">Unity</span>
+        <span class="skill-tag">Unreal</span>
+        <span class="skill-tag">Blender</span>
       </div>
     </div>
 
@@ -1772,11 +1786,20 @@ ul { list-style: none; }
     if (!el) return;
     function update() {
       var d = new Date();
-      var opts = { timeZone: 'America/Edmonton', hour: '2-digit', minute: '2-digit', hour12: false };
-      el.textContent = d.toLocaleTimeString('en-CA', opts);
+      var opts = { timeZone: 'America/Edmonton', hour: 'numeric', minute: '2-digit', hour12: true };
+      var parts = d.toLocaleTimeString('en-US', opts);
+      el.innerHTML = parts.replace(':', '<span style="animation:blink 2s step-end infinite;">:</span>');
     }
     update();
-    setInterval(update, 30000);
+    function schedule() {
+      var now = new Date();
+      var ms = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+      setTimeout(function() {
+        update();
+        schedule();
+      }, ms);
+    }
+    schedule();
   })();
 
   // ===== INIT =====
