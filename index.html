@@ -1090,10 +1090,10 @@ ul { list-style: none; }
     <div class="carousel-container">
       <div class="carousel-track" id="carouselTrack">
         <div class="project-card">
-          <h3>Building Tensorbit Core: A C++/CUDA Transformer Pruning Library</h3>
+          <h3>Tensorbit Core - A C++/CUDA Transformer Pruning Library</h3>
           <p><strong>Year Built: </strong>2026</p>
-          <p><strong>Results: </strong>Full P-D-Q pipeline (prune, distill, quant) for structured N:M sparsity on 7B-parameter models. Custom .tbm container format, CUDA-accelerated EHAP + CORING, BlockOBS greedy pruning. Prunes Mistral 7B in ~80 minutes, quantizes FP32 to INT4 (87% compression).</p>
-          <p class="project-desc">A C++/CUDA pruning library built as part of Tensorbit Labs that applies structured N:M sparsity to large language models using Hessian-aware pruning (EHAP) and coarse-to-fine mask generation (CORING). Features a custom binary container format (.tbm) for zero-copy GPU loading, multi-shard safetensors support, and an inference engine with 13 CUDA/C compute kernels for autoregressive transformer decoding on pruned models.</p>
+          <p><strong>Results: </strong>Production-ready pruning library for structured N:M sparsity on transformer models. Custom .tbm container format, CUDA-accelerated EHAP + CORING, BlockOBS greedy pruning. Prunes Mistral 7B in ~80 minutes with support for models of all sizes.</p>
+          <p class="project-desc">A C++/CUDA pruning library built as part of Tensorbit Labs's state-of-the-art pruning -> distillation -> quantization approach to compressing and optimizing large language models and vision transformers. Tensorbit Core, the first stage of the pipeline, applies structured N:M sparsity to models using Efficient Hessian Aware Pruning (EHAP) and coarse-to-fine mask generation (CORING). It also features a custom binary container format (.tbm) for zero-copy GPU loading, multi-shard safetensors support, and an inference engine with 13 CUDA/C compute kernels for autoregressive transformer decoding on pruned models.</p>
           <div class="project-tags">
             <span class="project-tag">C++/CUDA</span>
             <span class="project-tag">LLM Pruning</span>
