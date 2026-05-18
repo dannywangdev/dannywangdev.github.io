@@ -6,7 +6,7 @@
 <title>Building Tensorbit Core - Danny Wang</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M8 10 L4 16 L8 22' stroke='%232563eb' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cline x1='18' y1='9' x2='14' y2='23' stroke='%232563eb' stroke-width='3' stroke-linecap='round'/%3E%3Cpath d='M24 10 L28 16 L24 22' stroke='%232563eb' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <meta property="og:title" content="Building Tensorbit Core - Danny Wang">
-<meta property="og:description" content="A deep dive into designing a C++/CUDA transformer pruning library with EHAP and CORING.">
+<meta property="og:description" content="How I built a C++/CUDA pipeline for pruning 7B-parameter LLMs with structured N:M sparsity, Hessian-aware importance estimation, and a custom binary container format.">
 <meta property="og:url" content="https://dannywang.dev/writeups/building-tensorbit-core/">
 <meta property="og:type" content="article">
 <meta property="og:image" content="https://dannywang.dev/portfolio-preview.png">
@@ -29,8 +29,6 @@
   --text-tertiary: #5c6a7e; --accent: #60a5fa; --accent-hover: #3b82f6; --accent-light: #18233a;
   --border: #252f3f; --shadow: 0 1px 2px rgba(0,0,0,0.3); --shadow-card: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
 }
-[data-theme="dark"] .carousel-dot { background: #3a4660; }
-[data-theme="dark"] .carousel-btn:hover { border-color: var(--accent); color: var(--accent); }
 html { scroll-behavior: smooth; }
 body, .sidebar, .main, .footer { transition: background 0.4s ease, color 0.4s ease, border-color 0.4s ease; }
 body {
@@ -88,6 +86,14 @@ ul { list-style: none; }
 }
 .sidebar-link:hover { color: var(--accent); }
 
+.resume-btn {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  background: var(--accent); color: #fff; font-size: 0.82rem; font-weight: 500;
+  font-family: var(--font-heading); padding: 0.4rem 0.9rem; border-radius: var(--radius);
+  border: none; cursor: pointer; transition: background var(--transition); margin-top: 0.5rem;
+}
+.resume-btn:hover { background: var(--accent-hover); color: #fff; }
+
 .copy-btn {
   display: inline-flex; align-items: center; justify-content: center;
   background: none; border: none; cursor: pointer;
@@ -104,24 +110,13 @@ ul { list-style: none; }
 }
 .copy-tooltip.show { opacity: 1; }
 
-.resume-btn {
-  display: inline-flex; align-items: center; gap: 0.4rem;
-  background: var(--accent); color: #fff; font-size: 0.88rem; font-weight: 500;
-  font-family: var(--font-heading); padding: 0.5rem 1.1rem; border-radius: var(--radius);
-  border: none; cursor: pointer; transition: background var(--transition); margin-top: 0.5rem;
-}
-.resume-btn:hover { background: var(--accent-hover); color: #fff; }
-
 .theme-toggle { display: inline-flex; align-items: center; justify-content: center; background: none; border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-tertiary); cursor: pointer; padding: 0.3rem; margin-top: 0.5rem; transition: all var(--transition); }
 .theme-toggle:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-light); }
-
-.email-row a:hover { color: var(--accent); }
-.info-line svg { flex-shrink: 0; }
 
 .section { margin-bottom: 3rem; }
 .footer { padding: 1.25rem 0 2.5rem; border-top: 1px solid var(--border); margin-top: 1.5rem; font-size: 0.75rem; color: var(--text-tertiary); font-family: var(--font-body); }
 
-.article { max-width: 680px; }
+.article { max-width: 720px; }
 .article h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.3rem; line-height: 1.3; }
 .article .byline { font-size: 0.82rem; color: var(--text-tertiary); font-family: var(--font-mono); margin-bottom: 1.5rem; }
 .article h2 { font-size: 1.2rem; font-weight: 600; margin-top: 2rem; margin-bottom: 0.6rem; color: var(--text-primary); }
@@ -138,6 +133,16 @@ ul { list-style: none; }
   padding: 1rem; overflow-x: auto; margin-bottom: 1rem; font-size: 0.82rem; line-height: 1.5;
 }
 .article pre code { background: none; border: none; padding: 0; }
+.article .diagram {
+  display: flex; justify-content: center; margin: 1.5rem 0;
+  font-family: var(--font-mono); font-size: 0.78rem; line-height: 1.5;
+  color: var(--text-secondary); white-space: pre; overflow-x: auto;
+  background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem;
+}
+.article .diagram span.hl { color: var(--accent); font-weight: 600; }
+.article .diagram span.g { color: #10b981; }
+.article .diagram span.o { color: #f59e0b; }
+.article .diagram span.r { color: #ef4444; }
 .article-back { display: inline-block; margin-bottom: 1.5rem; font-size: 0.85rem; font-family: var(--font-heading); font-weight: 500; }
 .article-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.5rem; margin-bottom: 1.5rem; }
 .article-tag {
@@ -150,13 +155,13 @@ ul { list-style: none; }
   .sidebar-inner { flex-direction: row; align-items: center; width: 100%; gap: 0.75rem; flex-wrap: wrap; }
   .avatar { width: 44px; height: 44px; font-size: 0.9rem; margin-bottom: 0; flex-shrink: 0; }
   .sidebar h1 { font-size: 1rem; }
-  .sidebar .tagline, .sidebar .info-line, .sidebar .sidebar-section-title, .sidebar .sidebar-experience, .sidebar .email-row, .sidebar .social-links, .sidebar .resume-btn, .sidebar .sidebar-link, .sidebar .theme-toggle { display: none; }
+  .sidebar .tagline, .sidebar .info-line, .sidebar .sidebar-section-title, .sidebar .sidebar-experience, .sidebar .email-row, .sidebar .social-links, .sidebar .theme-toggle, .sidebar .sidebar-link { display: none; }
   .sidebar-mobile-content { display: flex; align-items: center; gap: 0.6rem; width: 100%; }
   .hamburger { display: inline-flex; align-items: center; justify-content: center; background: none; border: none; cursor: pointer; color: var(--text-secondary); padding: 0.3rem; border-radius: var(--radius-sm); transition: all var(--transition); flex-shrink: 0; margin-left: auto; }
   .hamburger:hover { color: var(--accent); background: var(--accent-light); }
   .sidebar.expanded { flex-direction: column; align-items: stretch; }
   .sidebar.expanded .sidebar-inner { flex-direction: column; align-items: flex-start; width: 100%; gap: 0.5rem; }
-  .sidebar.expanded .tagline, .sidebar.expanded .info-line, .sidebar.expanded .sidebar-section-title, .sidebar.expanded .sidebar-experience, .sidebar.expanded .email-row, .sidebar.expanded .social-links, .sidebar.expanded .resume-btn, .sidebar.expanded .sidebar-link, .sidebar.expanded .theme-toggle { display: flex; }
+  .sidebar.expanded .tagline, .sidebar.expanded .info-line, .sidebar.expanded .sidebar-section-title, .sidebar.expanded .sidebar-experience, .sidebar.expanded .email-row, .sidebar.expanded .social-links, .sidebar.expanded .theme-toggle, .sidebar.expanded .sidebar-link { display: flex; }
   .sidebar.expanded .sidebar-mobile-content { width: 100%; }
   .main { margin-left: 0; padding: 1.5rem 1.5rem 0; }
 }
@@ -170,14 +175,13 @@ ul { list-style: none; }
   .sidebar-mobile-content { display: flex; flex-direction: column; width: 100%; }
   .hamburger { display: none; }
 }
-/* ===== Print ===== */
 @media print {
   body { display: block; font-size: 11pt; color: #000; background: #fff; }
   .sidebar { position: static; width: 100%; min-height: auto; border: none; padding: 1rem 0; }
   .sidebar-inner { flex-direction: row; flex-wrap: wrap; gap: 0.5rem 1rem; }
   .avatar { width: 40px; height: 40px; font-size: 0.8rem; }
   .sidebar h1 { font-size: 1.1rem; }
-  .sidebar .tagline, .sidebar .info-line, .sidebar .sidebar-section-title, .sidebar .sidebar-experience, .sidebar .email-row, .sidebar .social-links, .sidebar .resume-btn, .sidebar .sidebar-link, .sidebar .theme-toggle, .sidebar-mobile-content, .hamburger { display: flex !important; }
+  .sidebar .tagline, .sidebar .info-line, .sidebar .sidebar-section-title, .sidebar .sidebar-experience, .sidebar .email-row, .sidebar .social-links, .sidebar .theme-toggle, .sidebar .sidebar-link { display: flex !important; }
   .main { margin: 0; padding: 1rem 0; max-width: 100%; }
   .article { max-width: 100%; }
   .section { margin-bottom: 1.25rem; page-break-inside: avoid; }
@@ -246,7 +250,6 @@ ul { list-style: none; }
       Download Resume
     </a>
     <a href="../../" class="sidebar-link">&larr; Portfolio</a>
-
     <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
       <svg class="theme-toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
@@ -258,85 +261,342 @@ ul { list-style: none; }
 
     <a href="../" class="article-back">&larr; Back to Writeups</a>
 
-    <h1>Building Tensorbit Core: A C++/CUDA Transformer Pruning Library</h1>
+    <h1>Building Tensorbit Core: The P-D-Q Pipeline</h1>
     <div class="article-tags">
-      <span class="article-tag">C++</span>
-      <span class="article-tag">CUDA</span>
-      <span class="article-tag">Model Optimization</span>
-      <span class="article-tag">LLM Sparsity</span>
+      <span class="article-tag">C++/CUDA</span>
+      <span class="article-tag">LLM Pruning</span>
+      <span class="article-tag">N:M Sparsity</span>
+      <span class="article-tag">EHAP</span>
+      <span class="article-tag">CORING</span>
     </div>
-    <p class="byline">May 2026 &middot; 15 min read</p>
+    <p class="byline">May 2026 &middot; 14 min read</p>
 
-    <p>Large language models keep getting bigger. Every new release pushes the parameter count higher, and with it the compute and memory requirements for inference. The standard response is to buy more GPUs. The better response is to prune.</p>
+    <p>
+      Large language models keep getting bigger. Every new release pushes the parameter count higher, and with it the compute and memory requirements for inference. The standard response is to buy more GPUs. <em>The better response is to prune.</em>
+    </p>
 
-    <p>Tensorbit Core is a pruning library I built as part of <a href="https://github.com/Tensorbit-Labs" target="_blank">Tensorbit Lab</a> that applies structured and semi-structured sparsity to transformer architectures at the CUDA level. This writeup covers the motivation, the algorithms (EHAP and CORING), the engineering decisions, and what I learned building a systems-level ML library from scratch in C++.</p>
+    <p>
+      Tensorbit Core is a pruning library I built as part of <a href="https://github.com/Tensorbit-Labs" target="_blank">Tensorbit Labs</a> that applies <strong>structured N:M sparsity</strong> to transformer architectures using Hessian-aware pruning and a custom binary container format. This writeup covers the full pipeline — from reading HuggingFace <code>.safetensors</code> weights to deploying a pruned model on an <a href="https://lambdalabs.com" target="_blank">A100 GPU</a> — and the engineering lessons learned along the way.
+    </p>
 
-    <h2>Motivation: Why Prune?</h2>
+    <h2>Why Prune?</h2>
 
-    <p>Most of the weights in a trained neural network are redundant. Research has shown that you can remove 50-90% of parameters with minimal accuracy loss. Pruning is the practice of zeroing out these redundant weights to produce a sparse network that is smaller, faster, and more power-efficient.</p>
+    <p>
+      A 7-billion-parameter model like Mistral 7B consumes 28 GB of RAM in FP32 (14 GB in BF16). The compute cost is dominated by the linear layers: each of the 32 layers has 4 attention projections (Q, K, V, O) and 3 MLP projections (Gate, Up, Down), each operating on 4096- or 14336-dimensional vectors. That's 224 matrix-vector multiplies per token, each doing tens of millions of multiply-accumulate operations.
+    </p>
 
-    <p>Existing pruning libraries like SparseGPT and Wanda work well but are designed for post-training pruning on already-trained models. Tensorbit Core takes a different approach: it integrates pruning into the model life cycle as a first-class operation, supporting both one-shot and iterative pruning with recovery fine-tuning.</p>
+    <p>
+      <strong>N:M structured sparsity</strong> forces exactly <em>N</em> non‑zero elements out of every <em>M</em>-element group. The 2:4 pattern is especially attractive because Ampere GPUs have <code>mma.sp</code> tensor core instructions that accelerate 2:4‑sparse matrix multiplication natively. In theory, this gives a <strong>2× compute speedup</strong> and a <strong>2× memory reduction</strong> with less than 1% accuracy loss on most benchmarks.
+    </p>
 
-    <h2>EHAP: Efficient Hessian Aware Pruning</h2>
+    <p>
+      Existing open-source tools (SparseGPT, Wanda) are research‑focused — they work in PyTorch on small models and don't produce deployable artifacts. Tensorbit Core was built from the ground up as a <strong>production pruning pipeline</strong> that takes real model weights and outputs a self‑contained container file ready for inference.
+    </p>
 
-    <p>The core idea behind EHAP is to use second-order information to decide which weights to prune. Instead of looking at weight magnitudes alone (which assumes all weights are equally important), EHAP approximates the Hessian to measure how much the loss changes when a weight is removed.</p>
+    <h2>The P-D-Q Pipeline: Architecture Overview</h2>
 
-    <p>The exact Hessian is prohibitively expensive to compute for large models. EHAP uses an efficient approximation: it computes the empirical Fisher information matrix using a calibration dataset, then uses the diagonal entries as a proxy for weight importance. Weights with low importance scores are pruned first.</p>
+    <p>The Tensorbit ecosystem follows a four-stage pipeline:</p>
 
-    <pre><code>// Simplified EHAP scoring
-for each layer in model:
-    features = layer.forward(calibration_data)
-    hessian_diag = sum(features.grad ** 2, dim=0)
-    importance = (weights ** 2) / (hessian_diag + EPS)
-    mask = importance > threshold(importance, sparsity_target)
-    weights *= mask</code></pre>
+    <div class="diagram">
+      <code>
+<span class="g">.safetensors</span>  ──→  <span class="hl">core (prune)</span>  ──→  <span class="o">.tbm</span>  ──→  <span class="hl">distill</span>  ──→  <span class="o">.tbm</span>  ──→  <span class="hl">quant</span>  ──→  <span class="o">.tbm</span>  ──→  <span class="hl">run</span>
+      </code>
+    </div>
 
-    <h2>CORING: Coarse-to-Fine Iterative Pruning</h2>
+    <ol>
+      <li><strong>tensorbit-core</strong> — Loads <code>.safetensors</code> model weights, runs Hessian‑aware pruning (EHAP) + structured N:M masking (CORING), and serializes to <code>.tbm</code>.</li>
+      <li><strong>tensorbit-distill</strong> — (future) Reads <code>.tbm</code>, writes <code>.tbm</code> with student model weights.</li>
+      <li><strong>tensorbit-quant</strong> — Reads <code>.tbm</code>, quantizes FP32→INT4/INT8, writes <code>.tbm</code> with scale metadata. <em>~3.6 GB output vs 29 GB input.</em></li>
+      <li><strong>tensorbit-run</strong> — Reads <code>.tbm</code>, runs autoregressive inference via CPU or CUDA backends with sparse N:M GEMM.</li>
+    </ol>
 
-    <p>CORING is the scheduling algorithm that controls how pruning progresses across layers. The insight is that different layers have different sensitivity to pruning. Early layers (closer to input) tend to be more sensitive; later layers can tolerate higher sparsity.</p>
+    <p>
+      Each stage communicates via a single file: the <code>.tbm</code> container. This is the core design insight — no database, no intermediate formats, no configuration catalogs. One file, one stage.
+    </p>
 
-    <p>CORING allocates sparsity targets to each layer adaptively: it starts with conservative targets, evaluates the loss impact, then redistributes the budget from less-sensitive to more-sensitive layers in subsequent iterations. Each iteration prunes a small percentage of weights, then runs a short recovery fine-tuning step.</p>
+    <h2>The .tbm Container Format</h2>
 
-    <p>This coarse-to-fine approach avoids the sharp accuracy drops that come with one-shot high-sparsity pruning. In practice, we found that three iterations with recovery between each was sufficient to reach 60% unstructured sparsity with less than 1% accuracy degradation on a BERT-base model.</p>
+    <p>
+      I designed the <code>.tbm</code> format to be simple enough to parse with 100 lines of C while supporting zero‑copy weight loading on GPU. The on‑disk layout is:
+    </p>
 
-    <h2>CUDA Implementation</h2>
+    <div class="diagram">
+      <code>
+┌─────────────────────────────┐
+│  Tensor 0 (.tb blob)        │
+│  ┌───────────┬───────┬────┐ │
+│  │ TBHeader  │ FP32  │Mask│ │
+│  │ (4096 B)  │ wt's  │    │ │
+│  └───────────┴───────┴────┘ │
+├─────────────────────────────┤
+│  Tensor 1                   │
+│  ...                        │
+├─────────────────────────────┤
+│  Tensor K                   │
+├─────────────────────────────┤
+│  JSON Index (UTF-8)         │
+│  {"name":"...","offset":0,  │
+│   "shape":[4096,4096],      │
+│   "nm_n":2,"nm_m":4,        │
+│   "dtype":"fp32",...}       │
+├─────────────────────────────┤
+│  4-byte LE uint32           │ ← JSON byte length
+└─────────────────────────────┘
+      </code>
+    </div>
 
-    <p>The pruning operations themselves run on GPU via custom CUDA kernels. The key kernel is a sparse-dense matrix multiplication that applies the binary mask during the forward pass. Instead of storing the full weight matrix and masking at runtime (which saves no compute), we use a compressed sparse row format that skips zeroed weights entirely.</p>
+    <p>
+      The <code>TBHeader</code> is a packed 4096-byte struct with fields for magic (<code>0x31304254</code> = "TB01"), version, N:M parameters, weight/mask byte counts, offsets, and a <code>precision</code> byte (0=FP32, 4=INT8, 5=INT4). The JSON index is read from the tail (seek backwards 4 bytes → read JSON length → seek back that many bytes → parse JSON). This means inference engines can <strong>mmap the entire file</strong> and access any tensor's data by offset with zero parsing overhead — the JSON index is only read once at load time.
+    </p>
 
-    <pre><code>// CUDA kernel: sparse-dense matmul with CSR format
-__global__ void csrmm_kernel(
-    const float* values, const int* col_indices, const int* row_ptr,
-    const float* input, float* output,
-    int M, int N, int K
-) {
-    int row = blockIdx.x * blockDim.x + threadIdx.x;
-    if (row >= M) return;
-    float sum = 0.0f;
-    for (int j = row_ptr[row]; j &lt; row_ptr[row + 1]; j++) {
-        int col = col_indices[j];
-        sum += values[j] * input[col];
-    }
-    output[row] = sum;
-}</code></pre>
+    <h2>EHAP: Efficient Hessian-Aware Pruning</h2>
 
-    <p>The library also includes a custom autograd function for PyTorch integration, allowing pruning-aware training with standard PyTorch optimizers and schedulers.</p>
+    <p>
+      The core pruning algorithm is <strong>Efficient Hessian-Aware Pruning</strong>. Instead of just looking at weight magnitudes (which throws away 90% of the available information), EHAP uses second‑order information to decide which weights to prune.
+    </p>
 
-    <h2>Results and Benchmarks</h2>
+    <p>
+      The Fisher information matrix measures how sensitive the loss is to each weight. For a diagonal approximation, the Fisher information for weight <em>w<sub>i</sub></em> is:
+    </p>
 
-    <p>We benchmarked Tensorbit Core against SparseGPT and Wanda on BERT-base and a small GPT-2 variant. At 50% unstructured sparsity, EHAP + CORING matched SparseGPT's perplexity while being 3x faster to compute (since it doesn't require the full Hessian inversion that SparseGPT does). At 70% sparsity, the accuracy gap widened slightly in SparseGPT's favor, but CORING with one recovery fine-tuning epoch closed the gap entirely.</p>
+    <div class="diagram">
+      <code>
+  F<sub>ii</sub> = E[(∂L/∂w<sub>i</sub>)²]
+      </code>
+    </div>
 
-    <p>The practical takeaway: if you can afford one recovery fine-tuning pass, EHAP + CORING matches or exceeds one-shot methods while being significantly cheaper to compute.</p>
+    <p>
+      This diagonal captures the curvature of the loss landscape. A weight with high Fisher information sits in a steep valley — zeroing it causes a large loss increase. A weight with low Fisher information sits on flat terrain — removing it has minimal impact.
+    </p>
 
-    <h2>Lessons Learned</h2>
+    <p>
+      EHAP accumulates the Fisher diagonal during a calibration pass and supports three importance modes:
+    </p>
+
+    <table style="width:100%;border-collapse:collapse;margin-bottom:1rem;font-size:0.9rem;color:var(--text-secondary);">
+      <tr style="border-bottom:1px solid var(--border);">
+        <th style="text-align:left;padding:0.4rem 0.5rem;color:var(--text-primary);">Mode</th>
+        <th style="text-align:left;padding:0.4rem 0.5rem;color:var(--text-primary);">Formula</th>
+        <th style="text-align:left;padding:0.4rem 0.5rem;color:var(--text-primary);">Behavior</th>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:0.4rem 0.5rem;"><code>OBD</code></td>
+        <td style="padding:0.4rem 0.5rem;"><em>w²·(F+λ)</em></td>
+        <td style="padding:0.4rem 0.5rem;">Optimal Brain Damage — product with Fisher</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:0.4rem 0.5rem;"><code>OBS</code></td>
+        <td style="padding:0.4rem 0.5rem;"><em>w²/(F+λ)</em></td>
+        <td style="padding:0.4rem 0.5rem;">Optimal Brain Surgeon — ratio, compensates other weights</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:0.4rem 0.5rem;"><code>Normalized</code></td>
+        <td style="padding:0.4rem 0.5rem;"><em>w²(F+λ)/(1+w²)</em></td>
+        <td style="padding:0.4rem 0.5rem;">Bounded version of OBD, stable for outliers</td>
+      </tr>
+    </table>
+
+    <p>
+      The Fisher diagonal uses <strong>EMA decay</strong> (exponential moving average with configurable alpha) to smooth the estimate across calibration steps. A <code>fisher_beta_decay_kernel</code> on GPU applies the decay in‑place without a host round‑trip.
+    </p>
+
+    <h3>BlockOBS: Greedy Pruning with Woodbury Updates</h3>
+
+    <p>
+      For the highest accuracy, EHAP includes <strong>BlockOBS</strong> — a block‑wise OBS implementation that constructs a 128×128 Hessian submatrix for each block of weights and performs greedy removal with Sherman‑Morrison rank‑1 updates. The Woodbury identity keeps the per‑block Hessian inversion tractable:
+    </p>
+
+    <div class="diagram">
+      <code>
+  H⁻¹ = D⁻¹ − D⁻¹ U (I + Uᵀ D⁻¹ U)⁻¹ Uᵀ D⁻¹
+      </code>
+    </div>
+
+    <p>
+      Where <em>D</em> is the diagonal of the Fisher matrix and <em>U</em> is a low‑rank factor built from gradient history. For each output row, BlockOBS uses a greedy loop: find the weight with the smallest saliency <em>w² / H⁻¹<sub>ii</sub></em>, compute the optimal update to the remaining weights, deflate the inverse via Sherman‑Morrison, and repeat until the sparsity target is met.
+    </p>
+
+    <p>
+      <strong>Trade‑off:</strong> BlockOBS is slow. Each 128×128 block does a full greedy loop with matrix rank‑1 updates, all on CPU via Eigen (the <code>prune()</code> method requires host‑resident weights). For Mistral 7B, BlockOBS takes <strong>8–12 hours</strong> on an A100. The <code>Iterative</code> strategy (multi‑round OBD with cubic sparsity schedule and GPU‑accelerated Fisher recompute) runs in <strong>30–45 minutes</strong>.
+    </p>
+
+    <h2>CORING: N:M Structured Sparsity</h2>
+
+    <p>
+      Once EHAP computes importance scores, <strong>CORING</strong> generates N:M masks and redistributes weight magnitude. CORING stands for <strong>Coarse‑to‑fine N:M mask generation</strong> — it operates on groups of <em>M</em> weights, ensuring exactly <em>N</em> survive in each group.
+    </p>
+
+    <div class="diagram">
+      <code>
+<span class="g">Importance scores</span>        <span class="o">2:4 Mask</span>
+[8.1, 0.3, 4.5, 1.2]   →   [<span class="hl">1</span>, <span class="r">0</span>, <span class="hl">1</span>, <span class="r">0</span>]
+[2.0, 6.3, 0.7, 5.1]   →   [<span class="r">0</span>, <span class="hl">1</span>, <span class="r">0</span>, <span class="hl">1</span>]
+      </code>
+    </div>
+
+    <p>Three mask strategies are implemented:</p>
 
     <ul>
-      <li><strong>CUDA debugging is hard.</strong> Learning to use <code>cuda-gdb</code> and <code>compute-sanitizer</code> was essential. Most bugs were memory access violations that only showed up at specific matrix sizes.</li>
-      <li><strong>Hessian approximation quality matters more than precision.</strong> A cheap diagonal approximation worked as well as more expensive block-diagonal methods for our use case.</li>
-      <li><strong>Integration with PyTorch's autograd is worth the effort.</strong> Being able to fine-tune with <code>optimizer.step()</code> after pruning made iterative pruning much easier to implement.</li>
-      <li><strong>Start with a single layer, then generalize.</strong> Debugging pruning logic on a 12-layer model is painful. Getting it right on one layer first saved hours.</li>
+      <li><strong>TopN</strong> — selects the N highest‑magnitude weights in each group by sorting. O(M·log M) per group.</li>
+      <li><strong>Optimal</strong> — enumerates all C(M, N) combinations via <strong>Gosper's hack</strong> (a clever bit‑twiddling algorithm from Knuth's TAOCP). Finds the provably optimal mask for the group. O(C(M, N)) per group — feasible for M ≤ 8, but 2:4 gives C(4,2)=6 combinations, which is negligible.</li>
+      <li><strong>Iterative</strong> — starts with TopN, then refines via swap‑and‑test: for each pair of kept‑kept and kept‑removed weights, try swapping and accept if the objective improves. Converges to near‑optimal in 2‑3 passes per group.</li>
     </ul>
 
-    <p>The full source is available on <a href="https://github.com/Tensorbit-Labs/tensorbit-core" target="_blank">GitHub</a>. This is an ongoing project, and I'm actively working on adding structured N:M sparsity patterns and quantization-aware pruning.</p>
+    <p>
+      After mask generation, CORING <strong>redistributes</strong> the pruned weight magnitude to the survivors. Two modes: <strong>proportional</strong> (adds the pruned magnitude scaled by the kept weight's share) and <strong>uniform</strong> (evenly distributes). This compensation step reduces the post‑pruning accuracy drop by 1‑3 percentage points.
+    </p>
+
+    <h2>CUDA Kernels</h2>
+
+    <p>
+      Both EHAP and CORING have GPU‑accelerated paths via CUDA kernels. Each kernel uses 256 threads per block with grid‑stride loops for arbitrary tensor sizes, compiled for SM80/SM90 with a <code>if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)</code> guard so users can override for consumer GPUs (e.g., <code>-DCMAKE_CUDA_ARCHITECTURES="86"</code> for RTX 3090):
+    </p>
+
+    <div class="diagram">
+      <code>
+  <span class="g">fisher_accumulate</span>       — accumulates square of gradient into Fisher diagonal
+  <span class="g">fisher_beta_decay</span>       — EMA decay of Fisher values (eliminates host round‑trip)
+  <span class="g">ehap_importance</span>         — computes OBD/OBS/Normalized scores
+  <span class="g">nm_mask_2_4</span>            — 2:4 mask, register‑only, 0 shared memory
+  <span class="g">nm_mask_generic</span>        — general N:M mask with cooperative shared‑memory ranking
+  <span class="g">apply_mask</span>              — applies binary mask to weight tensor
+  <span class="g">fisher_beta_decay_kernel</span> — GPU in‑place beta decay
+      </code>
+    </div>
+
+    <p>
+      The 2:4 mask kernel deserves special mention. Ampere's <code>mma.sp</code> tensor core instruction requires mask bytes in a specific layout: one byte per group of 4 output columns, with bits corresponding to kept positions within that group. The mask kernel produces exactly this format — groups are contiguous along the K‑dimension of the GEMM, matching the layout cuSPARSELt expects.
+    </p>
+
+    <h2>Multi‑Shard Model Support</h2>
+
+    <p>
+      Models like Mistral 7B are distributed as multiple <code>.safetensors</code> shards on HuggingFace (e.g., <code>model‑00001‑of‑00002.safetensors</code> and <code>model‑00002‑of‑00002.safetensors</code>). Tensorbit Core handles this by pruning each shard independently, producing per‑shard <code>.tb</code> directories, then running <code>merge_tbm.py</code> to concatenate the per‑tensor blobs into a single <code>.tbm</code> with a unified JSON index.
+    </p>
+
+    <p>
+      The <code>merge_tbm.py</code> script reads the per‑shard <code>model.tbm</code> JSON indexes to extract exact tensor shapes (since the per‑shard files have correct metadata from tb‑prune). If the per‑shard metadata isn't available, it falls back to inferring shapes from naming conventions: <code>q_proj</code> is detected as a square <code>[hidden, hidden]</code> matrix by checking that <code>sqrt(num_weights)</code> is an integer ≥ 512, and all other projection shapes are derived from that <code>hidden_size</code>.
+    </p>
+
+    <h2>Inference Engine: tensorbit-run</h2>
+
+    <p>
+      The inference side is a separate C engine (<code>tensorbit-run</code>) with a C++20 wrapper that provides RAII‑managed tensors, an autoregressive Transformer runner, and a backend registry for CPU/CUDA dispatch. The engine is organized as:
+    </p>
+
+    <ul>
+      <li><strong>13 C compute kernels</strong> in <code>src/ops/*.c</code> — dense/sparse linear, RMSNorm, GELU, SiLU, softmax, scaled dot‑product attention, RoPE (GQA‑aware), embedding, LayerNorm, residual add, conv2d.</li>
+      <li><strong>Hand‑rolled JSON parser</strong> (~150 lines) in <code>src/model.c</code> — parses the .tbm index with strings, integers, floats, arrays, and nested objects.</li>
+      <li><strong>Backend registry</strong> — static array of up to 8 <code>TbBackend</code> vtables. CPU backend initializes automatically; CUDA backend registers GPU implementations when compiled with <code>TENSORBIT_BACKEND_CUDA=ON</code>.</li>
+      <li><strong>TransformerRunner</strong> — full autoregressive Llama‑style forward pass with GQA expansion, KV cache, and flexible layer naming that probes multiple conventions (Llama, GPT‑J, Phi).</li>
+    </ul>
+
+    <h3>INT4 Weight Dequantization</h3>
+
+    <p>
+      When the <code>.tbm</code> contains INT4 weights (produced by <code>tensorbit-quant</code>), the runner's <code>weight_fp32()</code> helper dequantizes each tensor on‑the‑fly before passing it to the linear kernels. The dequantization unpacks the nibble‑packed INT4 values, multiplies by per‑group FP32 scales, and produces a temporary FP32 buffer that is consumed by the existing FP32 kernels. This temporary buffer is freed by RAII at the end of each operation, keeping peak memory at ~4.1 GB for a 3.6 GB .tbm (one tensor's worth of FP32 dequant buffer + the mmap'd file).
+    </p>
+
+    <h2>The Lambda Cloud Test</h2>
+
+    <p>
+      The real test was pruning Mistral 7B v0.1 on a Lambda A100 40GB GPU. The full workflow:
+    </p>
+
+    <ol>
+      <li><strong>Launch</strong> a Lambda GPU instance (A100 40GB, $1.99/hr)</li>
+      <li><strong>Setup:</strong> <code>sudo ./scripts/setup_cloud.sh</code> installs GCC 13, CUDA 12.6, Eigen3, Python, and all build tools</li>
+      <li><strong>Download:</strong> <code>python scripts/download_model.py --repo mistralai/Mistral-7B-v0.1</code></li>
+      <li><strong>Build:</strong> <code>cmake .. -DCMAKE_BUILD_TYPE=Release -GNinja && ninja</code></li>
+      <li><strong>Prune Shard 1:</strong> ~40 minutes with Iterative strategy (BlockOBS would take 8+ hours)</li>
+      <li><strong>Prune Shard 2:</strong> ~40 minutes</li>
+      <li><strong>Merge:</strong> <code>python merge_tbm.py --input ./pruned/1/ ./pruned/2/ --output model.tbm</code></li>
+      <li><strong>Download:</strong> <code>scp -r ubuntu@&lt;ip&gt;:.../pruned/ .</code> (30 GB, ~30 minutes)</li>
+    </ol>
+
+    <p>
+      The resulting <code>model.tbm</code> is 30.78 GB containing 291 tensor entries, each with its FP32 weights, N:M masks, and metadata. A JSON index at the tail maps tensor names to byte offsets with full shape information.
+    </p>
+
+    <h2>Engineering: Hard‑Earned Bugs</h2>
+
+    <p>
+      Over the course of building this pipeline, I ran into several bugs that cost days of debugging. Here are the ones that left a mark:
+    </p>
+
+    <h3>"Specialization after instantiation"</h3>
+    <p>
+      GCC 13 eagerly instantiates templates with inline method bodies. When I used <code>extern template class EHAPPruner&lt;float&gt;</code>, the compiler instantiated the template at the declaration site and then rejected the explicit instantiation in <code>ehap.cpp</code>. The fix was to <strong>remove all <code>extern template</code> declarations</strong> and let the linker handle duplicates. This is why every header in tensorbit-core has its implementation fully inline — <code>.cpp</code> files contain only empty explicit instantiations.
+    </p>
+
+    <h3><code>std::make_format_args</code> requires lvalue references</h3>
+    <p>
+      The project uses a custom thread‑safe Logger that formats messages with <code>std::vformat</code>. The Logger's <code>log()</code> method takes <code>std::string_view</code> (not <code>std::format_string</code>, which is C++23). Formatting happens at the macro call site via <code>std::make_format_args</code>, which only accepts <strong>lvalue references</strong>. Every log argument must be a named variable:
+    </p>
+
+<pre><code>// WRONG — literals, ternaries, and arithmetic all fail:
+TENSORBIT_LOG_INFO("x={}", 42);
+TENSORBIT_LOG_INFO("pct={:.1f}", 100.0 * a / b);
+
+// RIGHT — named variable:
+auto x = 42;
+TENSORBIT_LOG_INFO("x={}", x);</code></pre>
+
+    <h3>BF16 conversion is just a bit shift</h3>
+    <p>
+      HuggingFace stores Mistral 7B weights in BF16 format — the same 16‑bit float format used internally by A100 tensor cores. BF16→FP32 conversion is a single <code>uint16_t &lt;&lt; 16</code> operation. The exponent and mantissa bits are already in the right positions; only the width changes. <code>F16</code> (IEEE 754 half‑precision) requires proper exponent/mantissa extraction. Getting both correct was essential for the safetensors loader.
+    </p>
+
+    <h3>WSL2 vs. DrvFs: mmap and large files</h3>
+    <p>
+      On WSL2 (Windows Subsystem for Linux), the <code>DrvFs</code> filesystem (which mounts <code>/mnt/d/</code>) uses the 9p protocol to bridge the Linux and Windows file systems. The 9p driver <strong>cannot mmap files larger than ~1 GB</strong> — the kernel tries to pre‑allocate a buffer equal to the mapping size, causing <code>ENOMEM</code> for a 30 GB model file. The fix was a fallback in <code>tb_file_open_read()</code>: when <code>mmap</code> fails, <code>malloc</code> the full file size, then <code>read()</code> in a loop. This loads the entire 30 GB into virtual memory, consuming 30 GB of address space (but only the actively accessed pages fault in physical RAM). On WSL1, <code>mmap</code> works fine through the Windows syscall translation layer, but the per‑process virtual memory cap of 7.7 GB prevents loading 30 GB models entirely.
+    </p>
+
+    <h2>Quantization: From 30 GB to 4 GB</h2>
+
+    <p>
+      After pruning, the model is still 30 GB in FP32. To run inference on consumer hardware, I built <strong>tensorbit-quant</strong> — an INT4/INT8 quantization tool that reads an FP32 <code>.tbm</code> and writes a quantized <code>.tbm</code> with per‑group scale factors. The quantization scheme is:
+    </p>
+
+    <ul>
+      <li><strong>INT4 symmetric</strong> (default): Groups of 128 consecutive weights share one FP32 scale. Each weight is packed as a 4‑bit signed integer (range [-8, 7]), yielding <strong>87% compression</strong> vs FP32. Max dequantization error is bounded by half a quantization bin: <code>max_abs / 14</code>.</li>
+      <li><strong>INT8 symmetric per‑row</strong>: One scale per matrix row, each weight stored as a signed 8‑bit integer. 75% compression.</li>
+      <li><strong>Asymmetric INT4</strong>: Per‑group min/max with a zero‑point for better handling of non‑symmetric weight distributions.</li>
+    </ul>
+
+    <p>
+      The quantized <code>.tbm</code> stores scales between the packed INT4 weights and the N:M masks, with the JSON index recording <code>scale_count</code>, <code>group_size</code>, and <code>zp_count</code> per tensor. This allows the inference engine to locate scales without any out‑of‑band data — everything needed to load and dequantize is in the file itself.
+    </p>
+
+    <h2>Current Status &amp; Future Work</h2>
+
+    <p>
+      As of May 2026, the full pipeline is operational. The core pruning (EHAP + CORING + BlockOBS) is complete with 30/30 tests passing. The inference engine has 88/88 tests passing across 6 test suites. The quantizer produces valid INT4/INT8 output with verified dequantization error bounds.
+    </p>
+
+    <p>
+      The main remaining gaps are:
+    </p>
+
+    <ul>
+      <li><strong>Non‑Llama architectures</strong> — the inference runner hardcodes Llama‑style layer components (<code>self_attn.q_proj</code>, <code>mlp.gate_proj</code>). GPT‑J, Falcon, Phi, and Gemma need different component names and residual structures.</li>
+      <li><strong>BlockOBS performance</strong> — currently runs on CPU via Eigen. A GPU‑accelerated OBS path would reduce 8‑hour runs to minutes.</li>
+      <li><strong>Distillation</strong> — the second stage of the P‑D‑Q pipeline is not yet built. Training a 1.5B student model on the pruned teacher's outputs is the next major milestone.</li>
+      <li><strong>FP16/BF16 inference</strong> — the linear kernels currently only accept FP32 weights. Native FP16/BF16 inference would halve memory bandwidth compared to dequant‑to‑FP32.</li>
+    </ul>
+
+    <h2>Key Lessons</h2>
+
+    <ul>
+      <li><strong>Design for the format first.</strong> The <code>.tbm</code> format was the single most impactful design decision. Every stage writes and reads the same file. No pipeline integration bugs — just file I/O.</li>
+      <li><strong>Structured sparsity is not free.</strong> The 2× compute speedup from Ampere's <code>mma.sp</code> requires weights and masks in a specific layout and alignment. cuSPARSELt integration is necessary for production use.</li>
+      <li><strong>WSL is not a server.</strong> Building on WSL revealed a class of bugs (mmap failures, file path assumptions, memory limits) that would never appear on a cloud Linux server. The fallback paths I added for WSL compatibility also made the code more robust for edge cases on real servers.</li>
+      <li><strong>Test the full pipeline on day one.</strong> Getting an end‑to‑end test from <code>.safetensors</code> → pruned <code>.tbm</code> → quantized <code>.tbm</code> → inference was the most productive thing I did. Every subsequent feature was tested against this baseline.</li>
+    </ul>
+
+    <p>
+      The full source code is available on GitHub: <a href="https://github.com/Tensorbit-Labs" target="_blank">github.com/Tensorbit-Labs</a>.
+    </p>
 
     <p style="text-align:center;margin-top:2rem;"><a href="#" class="article-back">&uarr; Back to top</a></p>
 
@@ -380,7 +640,6 @@ __global__ void csrmm_kernel(
       }
     });
   }
-
   document.querySelectorAll('.copy-btn').forEach(function(btn) {
     btn.addEventListener('click', async function() {
       const email = btn.getAttribute('data-email');
